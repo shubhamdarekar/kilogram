@@ -2,12 +2,16 @@
 import tkinter as tk
 import Login_page
 import Signup
-import test
+import urllib.request
+import urllib.parse
 import LowerNavbar
 import pymysql
 import re
 import urllib.request
 import urllib.parse
+import math
+import random
+import Loginotp
 
 
 class Root(tk.Frame):
@@ -58,6 +62,14 @@ class Root(tk.Frame):
 	def presssignup(self):
 		self.signuppage = Signup.Signup_page(self)
 
+	def generateOTP(self) : 
+		digits = "0123456789"
+		OTP = "" 
+		for i in range(4) : 
+			OTP += digits[math.floor(random.random() * 10)] 
+  
+		return OTP
+
 	def presssignup1(self):
 		self.signuppage.firstnameempty.configure(text = '')
 		self.signuppage.lastnameempty.configure(text = '')
@@ -106,7 +118,7 @@ class Root(tk.Frame):
 		if len(username) >=20:
 			self.signuppage.usernameempty.configure(text = 'Length of Username should not be more than 20!!!')
 			flag = 0
-		if len(phnno) >=10:
+		if len(phnno) >10:
 			self.signuppage.phonenoempty.configure(text = 'Length of Phone number should not be more than 10!!!')
 			flag = 0
 		if not phnno.isdigit():
@@ -121,8 +133,8 @@ class Root(tk.Frame):
 		if not lname.isalnum():
 			self.signuppage.lastnameempty.configure(text = 'Last name should have only letters!!!')
 			flag = 0
-		if 
-		if flag = 1:
+
+		if flag == 1:
 			self.signuppage.firstnameempty.configure(text = '')
 			self.signuppage.lastnameempty.configure(text = '')
 			self.signuppage.emailempty.configure(text = '')
@@ -155,21 +167,38 @@ class Root(tk.Frame):
 					self.signuppage.emailempty.configure(text = 'Email Id already exists!! Use another Email Id')
 					flag = 1
 				if flag == 0:
-					self.mc.execute('INSERT into user (fname,lname,age,phoneNo,emailid,username) values ("%s","%s",%s,"%s","%s","%s")'%(fname,lname,age,phnno,email,username))
-					self.mydb.commit()
-					self.mc.execute('SELECT uid from user where username = "%s"'%(username))
-					self.uidli = self.mc.fetchall()
-					self.uidli = list(sum(self.uidli,()))
-					self.mc.execute('INSERT into auth (uid,passwd) values (%s,"%s")'%(self.uidli[0],password))
-					self.mydb.commit()
-					self.loginpage = Login_page.Login_page(self)
-					self.resp =  self.sendSMS('D/vVzW9HZmg-ShmTBFMcvXoHSSvRotC79CIw2QWK58', '+917045507826',
-    'Kilogram', 'Great Choice selecting Kilogram. To login in you account .Your Otp is %s')
-					self.loginpage.loginsuccesslabel.configure(text = 'Signup successfull!!!')
+					self.otp = self.generateOTP()
+					print(self.otp)
+					self.resp =  self.sendSMS('D/vVzW9HZmg-ShmTBFMcvXoHSSvRotC79CIw2QWK58', '+91%s'%(phnno),'Kilogram', 'Great Choice choosing Kilogram. In order to login into your account,your One Time Password is %s'%(str(self.otp)))
+					print(self.resp)
+					self.loginotp = Loginotp.Loginotp(self)
+					
 
 
-				
-	
+	def pressloginotp1(self):
+		fname = self.signuppage.firstnameentry.get()
+		lname = self.signuppage.lastnameentry.get()
+		age = self.signuppage.strvar.get()
+		email = self.signuppage.emailentry.get()
+		phnno = self.signuppage.phonenoentry.get()
+		username = self.signuppage.usernameentry.get()
+		password = self.signuppage.passwordentry.get()
+		cnfpassword = self.signuppage.confirmpasswordentry.get()
+		if self.loginotp.otpentry.get() == '':
+			self.loginotp.otpempty.configure(text='Otp box cannot be empty.')
+		else :
+			if self.loginotp.otpentry.get() == self.otp:
+				self.mc.execute('INSERT into user (fname,lname,age,phoneNo,emailid,username) values ("%s","%s",%s,"%s","%s","%s")'%(fname,lname,age,phnno,email,username))
+				self.mydb.commit()
+				self.mc.execute('SELECT uid from user where username = "%s"'%(username))
+				self.uidli = self.mc.fetchall()
+				self.uidli = list(sum(self.uidli,()))
+				self.mc.execute('INSERT into auth (uid,passwd) values (%s,"%s")'%(self.uidli[0],password))
+				self.mydb.commit()
+				self.loginpage = Login_page.Login_page(self)
+				self.loginpage.loginsuccesslabel.configure(text = 'Signup successfull!!!')
+			else :
+				self.loginotp.otpempty.configure(text = "Invalid otp")
 
 	def presslogin(self):
 		self.loginpage = Login_page.Login_page(self)
