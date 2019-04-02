@@ -5,6 +5,11 @@ import Signup
 import test
 import LowerNavbar
 import pymysql
+import re
+import urllib.request
+import urllib.parse
+
+
 class Root(tk.Frame):
 	def __init__(self,master):
 
@@ -30,6 +35,15 @@ class Root(tk.Frame):
 		cursor.execute('INSERT into user (fname,lname,age,phoneNo,emailid,username) values ("%s","%s","%s","%s","%s,"%s")'%(fname,lname,age,phnno,emailid,username))
 		cursor.commit()
 
+	def sendSMS(self,apikey, numbers, sender, message):
+	    data =  urllib.parse.urlencode({'apikey': apikey, 'numbers': numbers,
+	        'message' : message, 'sender': sender})
+	    data = data.encode('utf-8')
+	    request = urllib.request.Request("https://api.txtlocal.com/send/?")
+	    f = urllib.request.urlopen(request, data)
+	    fr = f.read()
+	    return(fr)
+
 	
 	def clickcancel(self):
 		self.master.destroy()
@@ -45,6 +59,13 @@ class Root(tk.Frame):
 		self.signuppage = Signup.Signup_page(self)
 
 	def presssignup1(self):
+		self.signuppage.firstnameempty.configure(text = '')
+		self.signuppage.lastnameempty.configure(text = '')
+		self.signuppage.emailempty.configure(text = '')
+		self.signuppage.phonenoempty.configure(text = '')
+		self.signuppage.usernameempty.configure(text = '')
+		self.signuppage.passwordempty.configure(text = '')
+		self.signuppage.confirmpasswordempty.configure(text = '')
 		fname = self.signuppage.firstnameentry.get()
 		lname = self.signuppage.lastnameentry.get()
 		age = self.signuppage.strvar.get()
@@ -54,22 +75,54 @@ class Root(tk.Frame):
 		password = self.signuppage.passwordentry.get()
 		cnfpassword = self.signuppage.confirmpasswordentry.get()
 		#print(fname,lname,age,email,phnno,password)
-		if fname == '' or lname == '' or email == '' or phnno == '' or password == '' or cnfpassword == '':
-			if fname == '':
-				self.signuppage.firstnameempty.configure(text = 'First name Cannot be Empty!!!')
-			if lname == '':
-				self.signuppage.lastnameempty.configure(text = 'Last name Cannot be Empty!!!')
-			if email == '':
-				self.signuppage.emailempty.configure(text = 'Email Address Cannot be Empty!!!')
-			if phnno == '':
-				self.signuppage.phonenoempty.configure(text = 'Phone number Cannot be Empty!!!')
-			if username == '':
-				self.signuppage.usernameempty.configure(text = 'Username number Cannot be Empty!!!')
-			if password == '':
-				self.signuppage.passwordempty.configure(text = 'Password Cannot be Empty!!!')
-			if cnfpassword == '':
-				self.signuppage.confirmpasswordempty.configure(text = 'This field Cannot be Empty!!!')
-		else :
+		flag = 1
+		if fname == '':
+			self.signuppage.firstnameempty.configure(text = 'First name Cannot be Empty!!!')
+			flag = 0
+		if lname == '':
+			self.signuppage.lastnameempty.configure(text = 'Last name Cannot be Empty!!!')
+			flag = 0
+		if email == '':
+			self.signuppage.emailempty.configure(text = 'Email Address Cannot be Empty!!!')
+			flag = 0
+		if phnno == '':
+			self.signuppage.phonenoempty.configure(text = 'Phone number Cannot be Empty!!!')
+			flag = 0
+		if username == '':
+			self.signuppage.usernameempty.configure(text = 'Username number Cannot be Empty!!!')
+			flag = 0
+		if password == '':
+			self.signuppage.passwordempty.configure(text = 'Password Cannot be Empty!!!')
+			flag = 0
+		if cnfpassword == '':
+			self.signuppage.confirmpasswordempty.configure(text = 'This field Cannot be Empty!!!')
+			flag = 0
+		if len(fname) >= 25:
+			self.signuppage.firstnameempty.configure(text = 'Length of First name should not be more than 25!!!')
+			flag = 0
+		if len(lname) >= 25:
+			self.signuppage.lastnameempty.configure(text = 'Length of Last name should not be more than 25!!!')
+			flag = 0
+		if len(username) >=20:
+			self.signuppage.usernameempty.configure(text = 'Length of Username should not be more than 20!!!')
+			flag = 0
+		if len(phnno) >=10:
+			self.signuppage.phonenoempty.configure(text = 'Length of Phone number should not be more than 10!!!')
+			flag = 0
+		if not phnno.isdigit():
+			self.signuppage.phonenoempty.configure(text = 'Phone number should have only numbers.')
+			flag = 0
+		if not username.isalnum():
+			self.signuppage.usernameempty.configure(text = 'Username should contain only numbers and digits.!!!')
+			flag = 0
+		if not fname.isalnum():
+			self.signuppage.firstnameempty.configure(text = 'First name should have only letters!!!')
+			flag = 0
+		if not lname.isalnum():
+			self.signuppage.lastnameempty.configure(text = 'Last name should have only letters!!!')
+			flag = 0
+		if 
+		if flag = 1:
 			self.signuppage.firstnameempty.configure(text = '')
 			self.signuppage.lastnameempty.configure(text = '')
 			self.signuppage.emailempty.configure(text = '')
@@ -110,6 +163,8 @@ class Root(tk.Frame):
 					self.mc.execute('INSERT into auth (uid,passwd) values (%s,"%s")'%(self.uidli[0],password))
 					self.mydb.commit()
 					self.loginpage = Login_page.Login_page(self)
+					self.resp =  self.sendSMS('D/vVzW9HZmg-ShmTBFMcvXoHSSvRotC79CIw2QWK58', '+917045507826',
+    'Kilogram', 'Great Choice selecting Kilogram. To login in you account .Your Otp is %s')
 					self.loginpage.loginsuccesslabel.configure(text = 'Signup successfull!!!')
 
 
@@ -121,18 +176,16 @@ class Root(tk.Frame):
 
 
 	def presslogin1(self):
+		self.loginpage.usernameempty.configure(text = '')
+		self.loginpage.passwordempty.configure(text = '')
 		username = self.loginpage.usernameentry.get()
 		password = self.loginpage.passwordentry.get()
 
 		if username =='' or password == '':
-			flag = 0
 			if username == '':
 				self.loginpage.usernameempty.configure(text = 'Username Cannot be empty!!!')
-				self.loginpage.passwordempty.configure(text = '')
-				flag = 1
 			if password == '':
 				self.loginpage.passwordempty.configure(text = 'Password Cannot be empty!!!')
-				if flag == 0 : self.loginpage.usernameempty.configure(text = '')
 		else:
 			self.loginpage.usernameempty.configure(text = '')
 			self.loginpage.passwordempty.configure(text = '')

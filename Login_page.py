@@ -1,6 +1,7 @@
 import tkinter as tk
 import pymysql
 
+
 class Login_page(tk.Frame):
 	def __init__(self,master):
 		# global usernamelabel
@@ -26,7 +27,7 @@ class Login_page(tk.Frame):
 		kilogramlabel=tk.Label(login_frame,text='Kilogram',font=35)
 		kilogramlabel.place(relx=0.2,rely=0.1,relwidth=0.6)
 
-		self.loginsuccesslabel = tk.Label(login_frame, text="", fg = 'red',bg="#ebedd7")
+		self.loginsuccesslabel = tk.Label(login_frame, text="", fg = 'green',bg="#ebedd7")
 		self.loginsuccesslabel.place(relx = 0.4, rely =0.2)
 
 		usernamelabel = tk.Label(login_frame, text="Username",bg="#ebedd7")
