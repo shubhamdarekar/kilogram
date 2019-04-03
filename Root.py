@@ -12,6 +12,11 @@ import urllib.parse
 import math
 import random
 import Loginotp
+import HomePage
+import SearchPage
+import AddPostPage
+import NotificationsPage
+import MyProfilePage
 
 
 class Root(tk.Frame):
@@ -55,9 +60,9 @@ class Root(tk.Frame):
 	def clickEscape(self,event):
 		self.master.destroy()
 
-	def _toggle_state(self,widget,state):
-		state = state if state in ('normal','disabled') else 'normal'
-		widget.configure(state = state)
+	# def _toggle_state(self,widget,state):
+	# 	state = state if state in ('normal','disabled') else 'normal'
+	# 	widget.configure(state = state)
 
 	def presssignup(self):
 		self.signuppage = Signup.Signup_page(self)
@@ -235,11 +240,26 @@ class Root(tk.Frame):
 				self.passwordli = self.mc.fetchall()
 				self.passwordli = list(sum(self.passwordli, ()))
 				if password in self.passwordli:
-					self.loggedin = LowerNavbar.Lowernavbar(self)
+					self.navbar = LowerNavbar.Lowernavbar(self)
+					self.homepage = HomePage.HomePage(self)
 				else :
 					self.loginpage.passwordempty.configure(text = 'Password is incorrect!!!')
 
 
+	def presshomebutton(self):
+		self.homepage = HomePage.HomePage(self)
+
+	def presssearchbutton(self):
+		self.searchpage = SearchPage.SearchPage(self)
+
+	def pressaddpostbutton(self):
+		self.addpostpage = AddPostPage.AddPostPage(self)
+
+	def pressnotificationsbutton(self):
+		self.notificationspage = NotificationsPage.NotificationsPage(self)
+
+	def pressmyprofilebutton(self):
+		self.myprofilepage = MyProfilePage.MyProfilePage(self)
 
 
 if __name__=='__main__':
