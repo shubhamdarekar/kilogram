@@ -1,5 +1,4 @@
 import tkinter as tk
-import pymysql
 
 
 class Login_page(tk.Frame):
@@ -55,7 +54,7 @@ class Login_page(tk.Frame):
 		signuppage_frame = tk.Frame(master.canvas, bg = '#ebedd7',relief='sunken')
 		signuppage_frame.place(height=70,width=756, relx = 0.15, rely =0.8 )
 
-		signup_label= tk.Label(signuppage_frame,text='New To kilogram? ')
+		signup_label= tk.Label(signuppage_frame,text='New To kilogram? ',fg = 'green',bg = "#ebedd7")
 		signup_label.pack()
 
 		signup_button= tk.Button(signuppage_frame,text = 'Signup', command = master.presssignup)

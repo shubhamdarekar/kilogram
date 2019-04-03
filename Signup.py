@@ -111,13 +111,16 @@ class Signup_page(tk.Frame):
 		self.confirmpasswordempty = tk.Label(signup_frame,text='', fg = 'red',bg="#ebedd7")
 		self.confirmpasswordempty.place(relx = 0.6, rely = 0.85)
 
-		signup_button2= tk.Button(signup_frame,text = 'Signup',command = master.presssignup1)
-		signup_button2.place(relx=0.4,rely=0.9,relwidth = 0.2)
+		signup_button2= tk.Button(signup_frame,text = 'Send OTP to Mobile Number',command = master.presssignup1)
+		signup_button2.place(relx=0.3,rely=0.9,relwidth = 0.25)
+
+		signup_button3= tk.Button(signup_frame,text = 'Send Otp To Email Id',command = master.presssignup1)
+		signup_button3.place(relx=0.6,rely=0.9,relwidth = 0.25)
 
 		loginpage_frame = tk.Frame(master.canvas, bg = '#ebedd7',relief='raised')
 		loginpage_frame.place(height=70,width=756, relx = 0.15, rely =0.8 )
 
-		loginlabel = tk.Label(loginpage_frame,bg="#ebedd7", text = "Already a User?")
+		loginlabel = tk.Label(loginpage_frame,bg="#ebedd7", text = "Already a User?",fg = 'green')
 		loginlabel.pack()
 
 		loginbutton = tk.Button(loginpage_frame,text="Login",command = master.presslogin)
