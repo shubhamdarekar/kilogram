@@ -2,8 +2,9 @@
 import tkinter as tk
 import Login_page
 import Signup
-import urllib.request
-import urllib.parse
+# import urllib.request
+# import urllib.parse
+import smtplib
 import LowerNavbar
 import pymysql
 import re
@@ -17,6 +18,7 @@ import SearchPage
 import AddPostPage
 import NotificationsPage
 import MyProfilePage
+import requests
 
 
 class Root(tk.Frame):
@@ -40,18 +42,37 @@ class Root(tk.Frame):
 		self.mc = self.mydb.cursor()
 		return self.mc
 
-	def insertinUser(self, cursor,fname,lname,age,phnno,emailid,username ):
-		cursor.execute('INSERT into user (fname,lname,age,phoneNo,emailid,username) values ("%s","%s","%s","%s","%s,"%s")'%(fname,lname,age,phnno,emailid,username))
-		cursor.commit()
+	# def insertinUser(self, cursor,fname,lname,age,phnno,emailid,username ):
+	# 	cursor.execute('INSERT into user (fname,lname,age,phoneNo,emailid,username) values ("%s","%s","%s","%s","%s,"%s")'%(fname,lname,age,phnno,emailid,username))
+	# 	cursor.commit()
 
 	def sendSMS(self,apikey, numbers, sender, message):
-	    data =  urllib.parse.urlencode({'apikey': apikey, 'numbers': numbers,
-	        'message' : message, 'sender': sender})
-	    data = data.encode('utf-8')
-	    request = urllib.request.Request("https://api.txtlocal.com/send/?")
-	    f = urllib.request.urlopen(request, data)
-	    fr = f.read()
-	    return(fr)
+		data =  urllib.parse.urlencode({'apikey': apikey, 'numbers': numbers,
+			'message' : message, 'sender': sender})
+		data = data.encode('utf-8')
+		try : 
+			request = urllib.request.Request("https://api.txtlocal.com/send/?")
+			f = urllib.request.urlopen(request, data)
+			fr = f.read()
+		except URLError :
+			pass
+
+	    
+		return(fr)
+#https://maker.ifttt.com/trigger/{event}/with/key/iPUGsUMmzf9dS90kfOlajV45ZiaYPlDKV-bFvelUqh9
+	def sendemail(self,emailid, otp):
+	    # report = {}
+	    # report["value1"] = emailid
+	    # report["value2"] = otp
+	    # return requests.post("https://maker.ifttt.com/trigger/OtpKilogram/with/key/iPUGsUMmzf9dS90kfOlajV45ZiaYPlDKV-bFvelUqh9",data = report)
+	    s = smtplib.SMTP('smtp.gmail.com', 587)
+	    s.starttls()
+	    s.login("kilogramapplikeinstagram@gmail.com", "qwerty@1234")
+	    message = "Great Choice choosing Kilogram. In order to login into your account,your One Time Password is %s"%(otp)
+	    s.sendmail("kilogramapplikeinstagram@gmail.com",emailid, message)
+	    s.quit()
+
+
 
 	
 	def clickcancel(self):
@@ -178,7 +199,108 @@ class Root(tk.Frame):
 					print(self.resp)
 					self.loginotp = Loginotp.Loginotp(self)
 					
+	def presssignup2(self):
+		self.signuppage.firstnameempty.configure(text = '')
+		self.signuppage.lastnameempty.configure(text = '')
+		self.signuppage.emailempty.configure(text = '')
+		self.signuppage.phonenoempty.configure(text = '')
+		self.signuppage.usernameempty.configure(text = '')
+		self.signuppage.passwordempty.configure(text = '')
+		self.signuppage.confirmpasswordempty.configure(text = '')
+		fname = self.signuppage.firstnameentry.get()
+		lname = self.signuppage.lastnameentry.get()
+		age = self.signuppage.strvar.get()
+		email = self.signuppage.emailentry.get()
+		phnno = self.signuppage.phonenoentry.get()
+		username = self.signuppage.usernameentry.get()
+		password = self.signuppage.passwordentry.get()
+		cnfpassword = self.signuppage.confirmpasswordentry.get()
+		#print(fname,lname,age,email,phnno,password)
+		flag = 1
+		if fname == '':
+			self.signuppage.firstnameempty.configure(text = 'First name Cannot be Empty!!!')
+			flag = 0
+		if lname == '':
+			self.signuppage.lastnameempty.configure(text = 'Last name Cannot be Empty!!!')
+			flag = 0
+		if email == '':
+			self.signuppage.emailempty.configure(text = 'Email Address Cannot be Empty!!!')
+			flag = 0
+		if phnno == '':
+			self.signuppage.phonenoempty.configure(text = 'Phone number Cannot be Empty!!!')
+			flag = 0
+		if username == '':
+			self.signuppage.usernameempty.configure(text = 'Username number Cannot be Empty!!!')
+			flag = 0
+		if password == '':
+			self.signuppage.passwordempty.configure(text = 'Password Cannot be Empty!!!')
+			flag = 0
+		if cnfpassword == '':
+			self.signuppage.confirmpasswordempty.configure(text = 'This field Cannot be Empty!!!')
+			flag = 0
+		if len(fname) >= 25:
+			self.signuppage.firstnameempty.configure(text = 'Length of First name should not be more than 25!!!')
+			flag = 0
+		if len(lname) >= 25:
+			self.signuppage.lastnameempty.configure(text = 'Length of Last name should not be more than 25!!!')
+			flag = 0
+		if len(username) >=20:
+			self.signuppage.usernameempty.configure(text = 'Length of Username should not be more than 20!!!')
+			flag = 0
+		if len(phnno) >10:
+			self.signuppage.phonenoempty.configure(text = 'Length of Phone number should not be more than 10!!!')
+			flag = 0
+		if not phnno.isdigit():
+			self.signuppage.phonenoempty.configure(text = 'Phone number should have only numbers.')
+			flag = 0
+		if not username.isalnum():
+			self.signuppage.usernameempty.configure(text = 'Username should contain only numbers and digits.!!!')
+			flag = 0
+		if not fname.isalnum():
+			self.signuppage.firstnameempty.configure(text = 'First name should have only letters!!!')
+			flag = 0
+		if not lname.isalnum():
+			self.signuppage.lastnameempty.configure(text = 'Last name should have only letters!!!')
+			flag = 0
 
+		if flag == 1:
+			self.signuppage.firstnameempty.configure(text = '')
+			self.signuppage.lastnameempty.configure(text = '')
+			self.signuppage.emailempty.configure(text = '')
+			self.signuppage.phonenoempty.configure(text = '')
+			self.signuppage.passwordempty.configure(text = '')
+			self.signuppage.confirmpasswordempty.configure(text = '')
+			if cnfpassword != password :
+				self.signuppage.confirmpasswordempty.configure(text = "Passord doesn't match")
+			else :
+				flag = 0
+				self.mc = self.connecttodatabase()
+				self.mc.execute("select username from user")
+				self.usernameli = self.mc.fetchall()
+				self.usernameli = list(sum(self.usernameli, ()))
+				if username in self.usernameli:
+					self.signuppage.usernameempty.configure(text = 'Username already exists!! Try another username')
+					flag = 1
+				self.mc.execute("select phoneNo from user")
+				self.phnnoli = self.mc.fetchall()
+				# print(self.phnnoli)
+				self.phnnoli = list(sum(self.phnnoli, ()))
+				# print((self.phnnoli))
+				if (phnno) in self.phnnoli :
+					self.signuppage.phonenoempty.configure(text = 'Phone Number already exists!! Use another phone number!!')
+					flag = 1
+				self.mc.execute("select emailid from user")
+				self.emailidli = self.mc.fetchall()
+				self.emailidli = list(sum(self.emailidli, ()))
+				if email in self.emailidli :
+					self.signuppage.emailempty.configure(text = 'Email Id already exists!! Use another Email Id')
+					flag = 1
+				if flag == 0:
+					self.otp = self.generateOTP()
+					print(self.otp)
+					self.emailotp = self.sendemail(email,self.otp)
+					print(self.emailotp)
+					self.loginotp = Loginotp.Loginotp(self)
 
 	def pressloginotp1(self):
 		fname = self.signuppage.firstnameentry.get()
@@ -228,8 +350,11 @@ class Root(tk.Frame):
 			self.usernameli = self.mc.fetchall()
 			self.usernameli = list(sum(self.usernameli, ()))
 			if username not in self.usernameli :
-				self.loginpage.usernameempty.configure(text = 'The Username Entered is wrong.')
+				self.loginpage.usernameempty.configure(text = 'The Username entered was wrong.')
+				self.loginpage.usernameentry.delete(0,100)
+				self.loginpage.passwordentry.delete(0,100)
 			else:
+				self.username = username
 				self.sql = 'SELECT uid from user where username ="%s" '
 				self.mc.execute(self.sql % username)
 				self.uidli = self.mc.fetchall()
@@ -244,6 +369,7 @@ class Root(tk.Frame):
 					self.homepage = HomePage.HomePage(self)
 				else :
 					self.loginpage.passwordempty.configure(text = 'Password is incorrect!!!')
+					self.loginpage.passwordentry.delete(0,100)
 
 
 	def presshomebutton(self):
@@ -251,6 +377,31 @@ class Root(tk.Frame):
 
 	def presssearchbutton(self):
 		self.searchpage = SearchPage.SearchPage(self)
+
+	def presssearchbutton1(self):
+		self.fusername = self.searchpage.search_entry.get()
+		sql = 'SELECT uid from user where username like "%s"'
+		self.mc.execute(sql % ("%"+self.fusername+"%"))
+		uid = self.mc.fetchall()
+		uid = list(sum(uid, ()))
+		self.fuserli = []
+		for i in uid :
+			self.sql1 = 'SELECT username from user where uid = %s'
+			self.fusername = self.mc.execute(self.sql1 % i)
+			self.fuser = self.mc.fetchall()
+			self.fuser = list(sum(self.fuser, ()))
+			self.fuserli.append(self.fuser)
+
+		print(self.fuserli)
+		msg = ''
+		for i in self.fuserli :
+			for j in self.fuserli[self.fuserli.index(i)]:
+				print(i)
+				msg = msg + i + '\n'
+
+		self.searchpage.searches.configure(text = 'msg')
+		
+
 
 	def pressaddpostbutton(self):
 		self.addpostpage = AddPostPage.AddPostPage(self)
@@ -260,6 +411,27 @@ class Root(tk.Frame):
 
 	def pressmyprofilebutton(self):
 		self.myprofilepage = MyProfilePage.MyProfilePage(self)
+		self.mc = self.connecttodatabase()
+		self.mc.execute("Select count(uid) from friends where uid = %s "%(self.uid))
+		self.following = self.mc.fetchall()
+		self.following = list(sum(self.following, ()))
+		self.myprofilepage.followingnumber.configure(text = self.following[0])
+
+		self.mc.execute("Select count(fuid) from friends where fuid = %s "%(self.uid))
+		self.followers = self.mc.fetchall()
+		self.followers = list(sum(self.followers, ()))
+		self.myprofilepage.followernumber.configure(text = self.followers[0])
+
+		self.mc.execute("Select count(uid) from posts where uid = %s "%(self.uid))
+		self.post = self.mc.fetchall()
+		self.post = list(sum(self.post, ()))
+		self.myprofilepage.postnumber.configure(text = self.post[0])
+
+		self.myprofilepage.username1label.configure(text = self.username)
+
+	def presslogoutbutton(self):
+		self.loginpage = Login_page.Login_page(self)
+
 
 
 if __name__=='__main__':

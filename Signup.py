@@ -114,7 +114,7 @@ class Signup_page(tk.Frame):
 		signup_button2= tk.Button(signup_frame,text = 'Send OTP to Mobile Number',command = master.presssignup1)
 		signup_button2.place(relx=0.3,rely=0.9,relwidth = 0.25)
 
-		signup_button3= tk.Button(signup_frame,text = 'Send Otp To Email Id',command = master.presssignup1)
+		signup_button3= tk.Button(signup_frame,text = 'Send Otp To Email Id',command = master.presssignup2)
 		signup_button3.place(relx=0.6,rely=0.9,relwidth = 0.25)
 
 		loginpage_frame = tk.Frame(master.canvas, bg = '#ebedd7',relief='raised')
