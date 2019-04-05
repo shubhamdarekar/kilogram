@@ -5,14 +5,14 @@ class AddCaptionPage(tk.Frame):
 		mainframe = tk.Frame(master.navbar.midframe,bg = 'white')
 		mainframe.place(relheight=1,relwidth = 1)
 
-		imageframe = tk.Frame(mainframe)
-		imageframe.place(relheight = 0.5,relwidth = 0.7 , relx = 0.15,rely=0.1)
+		self.imageframe = tk.Frame(mainframe)
+		self.imageframe.place(relheight = 0.5,relwidth = 0.7 , relx = 0.15,rely=0.1)
 
-		imagelabel = tk.Label(imageframe)
-		imagelabel.place(relheight=1,relwidth=1)
+		self.imagelabel = tk.Label(self.imageframe)
+		self.imagelabel.place(relheight=1,relwidth=1)
 
 		img =tk.PhotoImage(file = master.filepath)
-		imagelabel.configure(image = img)
+		self.imagelabel.configure(image = img)
 		
 		self.captionbox = tk.Entry(mainframe,bg ='white')
 		self.captionbox.place(relwidth = 0.7,relheight = 0.2,relx = 0.15,rely = 0.65)

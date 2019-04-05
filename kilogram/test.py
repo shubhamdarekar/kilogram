@@ -1,65 +1,61 @@
-import tkinter as tk
+import sqlite3
+import pymysql
+import os.path
+from os import listdir, getcwd
+from IPython.core.display import Image
 from tkinter import filedialog
-# import os
-# def load_photo_tab_two(file_path):
-# 	img = image_path(file_path)
-# 	imglabel2.configure(image = img)
-# 	imglabel2.image = img
-# def select_image():
-# 	path = filedialog.askopenfilename(initialdir = "/",title = "Select File",filetypes = (("PNGs","*.png"),("GIFs","*.gif"),("All Files","*.*")))
-
-# 	try :
-# 		if path :
-# 			fname = os.path.basename(path)
-# 			fnh = db_config.PHOTO_DIRECTORY + fname
-# 			fcopy = path
-# 			imgselected = True
-# 			load_photo_tab_two(fcopy)
-
-# 	except IOError as err:
-# 		image_selected = False
-# 		messagebox.showinfo("File Error", err)
-
-# select_image()
-
-# root = tk.Tk()
-
-# # filepath = 'C:/Users/shubh/OneDrive/Desktop/download.png'
-# filepath = filedialog.askopenfilename()
-# # print(filepath)
-# image =tk.PhotoImage(file = filepath)
-# newlabel = tk.Label(root,image = image)
-# newlabel.place(relwidth = 1,relheight = 1)
-
-# filepath = filedialog.askopenfilename()
-# #addpostpage = AddPostPage.AddPostPage(
-# img =tk.PhotoImage(file = filepath)
-# print(img)
-# newlabel = tk.Canvas(root,width = 1000,height = 1000,bg='red')
-# newlabel.pack()
-# newlabel.create_image(20,20,anchor = 'nw',image = img)
-
-# root.mainloop()
+import tkinter as tk
+import mysql.connector
+import pickle
+from PIL import Image
+import request
 
 
-# from tkinter import *
-# import datetime
 
-# root = Tk()
+mydb = pymysql.connect(host="192.168.1.9",user="root1",passwd="",db="projectdb")
+conn= mydb.cursor()
 
-# lab = Label(root)
-# lab.pack()
+filepath = filedialog.askopenfilename()
+file = request.files['inputfile']
 
-# def clock():
-#     time = datetime.datetime.now().strftime("Time: %H:%M:%S")
-#     lab.config(text=time)
-#     #lab['text'] = time
-#     root.after(1000, clock) # run itself again after 1000 ms
+# with open(filepath, 'rb') as input_file:
+# 	ablob = input_file.read()
 
-# # run first time
-# clock()
+img =Image.open( filepath)
 
-# root.mainloop()
-global filepath
-p=(filepath == None)
-print(p)
+# image = {
+#     'pixels': img.tobytes(),
+#     'size': img.size,
+#     'mode': img.mode,
+# }
+ablob = open('pickl.pkl', 'wb')
+pickle.dump(img,ablob)
+print(ablob)
+# base=os.path.basename(filepath)
+# afile, ext = os.path.splitext(base)
+sql = '''INSERT INTO tp
+(img)
+VALUES("%s");'''
+conn.execute(sql%(pickl.pkl))
+
+mydb.commit()
+mydb.close()
+
+mydb = mysql.connector.connect(host="192.168.1.9",user="root1",passwd="",db="projectdb")
+conn= mydb.cursor()
+
+sql = "SELECT img FROM tp WHERE id = '%s'"
+# param = {'id': 0}
+conn.execute(sql% '1')
+ablob = [item[0] for item in conn.fetchall()]
+im = open(ablob[0],'rb')
+imm= pickle.load(im)
+# filename = 'abc.png'
+# with open(filename, 'wb') as output_file:
+# 	output_file.write(ablob[0])
+img = Image(filename = './'+filename)
+
+root = tk.Tk()
+imglabel = tk.Label(root,height = 100,image = img)
+imglabel.pack()
+root.mainloop()

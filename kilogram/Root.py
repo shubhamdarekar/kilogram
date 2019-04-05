@@ -27,8 +27,6 @@ import DM_Page
 from tkinter import filedialog
 from PIL import ImageTk, Image
 import AddCaptionPage
-import sys
-sys.setdefaultencoding('utf8')
 #import ChangeProfilePicture
 #import CameraPage
 
@@ -69,7 +67,7 @@ class Root(tk.Frame):
 		except URLError :
 			pass
 
-	    
+
 		return(fr)
 #https://maker.ifttt.com/trigger/{event}/with/key/iPUGsUMmzf9dS90kfOlajV45ZiaYPlDKV-bFvelUqh9
 	def sendemail(self,emailid, otp):
@@ -455,10 +453,14 @@ class Root(tk.Frame):
 		self.filepath = ''
 		self.filepath = filedialog.askopenfilename()
 		self.addpostpage = AddPostPage.AddPostPage(self)
-		img =tk.PhotoImage(file = self.filepath)
-		# self.newlabel = tk.Canvas(self.addpostpage.filelabel,width = 1000,height = 1000,bg='red')
-		# self.newlabel.pack()
-		self.addpostpage.filelabel.configure(image = img)
+		try:
+			img =tk.PhotoImage(file = self.filepath)
+			# self.newlabel = tk.Canvas(self.addpostpage.filelabel,width = 1000,height = 1000,bg='red')
+			# self.newlabel.pack()
+		except (tk.TclError):
+			self.addpostpage.filelabel.configure(text = 'Please Upload a image png File.',fg = 'red')
+		else:
+			self.addpostpage.filelabel.configure(image = img)
 		self.mainloop()
 		# self.addpostpage.filelabel.configure(image = image)
 
@@ -490,26 +492,30 @@ class Root(tk.Frame):
 		args = (self.uid)
 		self.mc.execute(sql,args)
 		self.mydb.commit()
-		self.image = self.mc.fetchall()
-		self.image = list(sum(self.image,()))
-		
+		self.image = self.mc.fetchone()
+		img = tk.PhotoImage(data = self.image)
+		self.myprofilepage.imagepost_frame.configure(image = img)
+		# self.image = self.mc.fetchall()
+		# self.image = list(sum(self.image,()))
+		# print(len(self.image))
 
-		data = {}
-		button = {}
-		i = 0
-		for image in self.image:
-			with open(image, 'wb') as file:
-				file.write(data[i])
+		# data = {}
+		# button = {}
+		# i = 0
+		# for image in self.image:
 
-			data[i] = PhotoImage(data = data[i])
-			i = i+1
+		# 	with open(image, 'wb') as file:
+		# 		file.write(data[i])
 
-			e = tk.Button(self.myprofilepage.imagepost_frame,text = 'Button',height = 200,width = 220, image = data[i])
-			e.grid(row = 0,column = 0,columnspan = 30,rowspan = '10',padx = 10,pady = 10)
-			button[i] = e
+		# 	data[i] = tk.PhotoImage(data = image)
+		# 	i = i+1
 
-		with open(filename, 'wb') as file:
-			file.write(data)
+		# 	e = tk.Button(self.myprofilepage.imagepost_frame,text = 'Button',height = 200,width = 220, image = data[i])
+		# 	e.grid(row = 0,column = i,columnspan = 30,rowspan = '10',padx = 10,pady = 10)
+		# 	button[i] = e
+
+		# with open(filename, 'wb') as file:
+		# 	file.write(data)
 		# self.myprofilepage.image_button.configure(image = )
 
 
@@ -569,9 +575,12 @@ class Root(tk.Frame):
 			pass
 		else :
 			self.addcaptionpage = AddCaptionPage.AddCaptionPage(self)
+			img =tk.PhotoImage(file = self.filepath)
+			self.addcaptionpage.imagelabel.configure(image = img)
+			self.mainloop()
+
 
 	def upload(self):
-		self.cap = ''
 		self.cap = self.addcaptionpage.captionbox.get()
 
 		with open(self.filepath, 'rb') as file:
