@@ -1,5 +1,6 @@
 # import AppKit
 import tkinter as tk
+from tkinter import ttk
 import Login_page
 import Signup
 # import urllib.request
@@ -23,6 +24,11 @@ import EditProfile
 import ChangeUsername
 import ChangePassword
 import DM_Page
+from tkinter import filedialog
+from PIL import ImageTk, Image
+import AddCaptionPage
+import sys
+sys.setdefaultencoding('utf8')
 #import ChangeProfilePicture
 #import CameraPage
 
@@ -445,6 +451,17 @@ class Root(tk.Frame):
 	def pressaddpostbutton(self):
 		self.addpostpage = AddPostPage.AddPostPage(self)
 
+	def pressaddpostbutton1(self):
+		self.filepath = ''
+		self.filepath = filedialog.askopenfilename()
+		self.addpostpage = AddPostPage.AddPostPage(self)
+		img =tk.PhotoImage(file = self.filepath)
+		# self.newlabel = tk.Canvas(self.addpostpage.filelabel,width = 1000,height = 1000,bg='red')
+		# self.newlabel.pack()
+		self.addpostpage.filelabel.configure(image = img)
+		self.mainloop()
+		# self.addpostpage.filelabel.configure(image = image)
+
 	def pressnotificationsbutton(self):
 		self.notificationspage = NotificationsPage.NotificationsPage(self)
 
@@ -468,6 +485,33 @@ class Root(tk.Frame):
 		self.myprofilepage.postnumber.configure(text = self.post[0])
 
 		self.myprofilepage.username1label.configure(text = self.username)
+		print(self.uid)
+		sql = "SELECT imgs from posts where uid = %s"
+		args = (self.uid)
+		self.mc.execute(sql,args)
+		self.mydb.commit()
+		self.image = self.mc.fetchall()
+		self.image = list(sum(self.image,()))
+		
+
+		data = {}
+		button = {}
+		i = 0
+		for image in self.image:
+			with open(image, 'wb') as file:
+				file.write(data[i])
+
+			data[i] = PhotoImage(data = data[i])
+			i = i+1
+
+			e = tk.Button(self.myprofilepage.imagepost_frame,text = 'Button',height = 200,width = 220, image = data[i])
+			e.grid(row = 0,column = 0,columnspan = 30,rowspan = '10',padx = 10,pady = 10)
+			button[i] = e
+
+		with open(filename, 'wb') as file:
+			file.write(data)
+		# self.myprofilepage.image_button.configure(image = )
+
 
 	def presslogoutbutton(self):
 		self.loginpage = Login_page.Login_page(self)
@@ -520,7 +564,27 @@ class Root(tk.Frame):
 	def pressmessagebutton(self):
 		self.dmpage = DM_Page.DM_Page(self)
 
+	def pressnextbutton(self):
+		if self.filepath == '':
+			pass
+		else :
+			self.addcaptionpage = AddCaptionPage.AddCaptionPage(self)
 
+	def upload(self):
+		self.cap = ''
+		self.cap = self.addcaptionpage.captionbox.get()
+
+		with open(self.filepath, 'rb') as file:
+			binaryData = file.read()
+    		
+		sql = 'INSERT into posts(uid,imgs,tags,caption) values ("%s","%s","%s","%s")'
+		args = (self.uid,binaryData,self.uid,self.cap)
+		self.mc.execute(sql,args)
+		self.mydb.commit()
+
+		self.pressmyprofilebutton()
+
+       	
 if __name__=='__main__':
 	# info = AppKit.NSBundle.mainBundle().infoDictionary()
 	# info['LSUIElement'] = True

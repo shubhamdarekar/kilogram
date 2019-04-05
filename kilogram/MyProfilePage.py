@@ -50,7 +50,7 @@ class MyProfilePage(tk.Frame):
 		tags_button=tk.Button(mid_frame, text="Tag", font=('bold'))
 		tags_button.place(relx=0.65,rely=0.09, relwidth=0.278, relheight=0.85)
 
-		imagepost_frame = tk.Frame(mainprofileframe, bg = '#ebedd7',relief='sunken')
-		imagepost_frame.place(height=400,width=650, relx = 0.167, rely =0.38)
+		self.imagepost_frame = tk.Frame(mainprofileframe, bg = '#ebedd7',relief='sunken')
+		self.imagepost_frame.place(height=400,width=660, relx = 0.167, rely =0.38)
 
 
