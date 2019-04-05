@@ -12,7 +12,7 @@ class MyProfilePage(tk.Frame):
 		imagelabel.place(relx=0.22,rely=0.05,relwidth=0.15, relheight=0.18)
 
 		self.username1label=tk.Label(mainprofileframe,bg = 'pink',font = ('Ariel',25))
-		self.username1label.place(relx=0.22,rely=0.23,relwidth=0.15, relheight=0.035)
+		self.username1label.place(relx=0.22,rely=0.23,relwidth=0.15, relheight=0.055)
 
 		self.postnumber = tk.Label(mainprofileframe,text = '0',bg = 'pink',font = ('Ariel',30) )
 		self.postnumber.place(relx = 0.44,rely = 0.09)
@@ -35,7 +35,7 @@ class MyProfilePage(tk.Frame):
 		logout_button = tk.Button(mainprofileframe,text = "Logout",command = master.presslogoutbutton)
 		logout_button.place(relx = 0.89,rely = 0.03,relwidth = 0.1,relheight = 0.06)
 
-		edit_button = tk.Button(mainprofileframe,text = 'Edit Profile', font=('bold'))
+		edit_button = tk.Button(mainprofileframe,text = 'Edit Profile', font=('bold'),command = master.presseditprofilebutton)
 		edit_button.place(relx = 0.4, rely = 0.22, relwidth=0.38, relheight=0.037)
 
 		mid_frame=tk.Frame(mainprofileframe,bg='pink')

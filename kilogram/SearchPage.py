@@ -17,9 +17,9 @@ class SearchPage(tk.Frame):
 		self.search_button = tk.Button(searchpage_frame,bg = "white",text = "Search",command = master.presssearchbutton1)
 		self.search_button.place(relwidth = 0.1,relheight = 0.04,relx = 0.7,rely= 0.067)
 
-		frame = tk.Frame(searchpage_frame,bg = "white")
-		frame.place(relheight = 0.1,relwidth = 0.6,relx = 0.2,rely = 0.15)
+		self.frame = tk.Frame(searchpage_frame,bg = "white")
+		self.frame.place(relheight = 0.8,relwidth = 0.6,relx = 0.2,rely = 0.15)
 
 		
-		self.searches = tk.Message(searchpage_frame,text = '')
-		self.searches.pack()
+		# self.searches = tk.Message(searchpage_frame,text = '')
+		# self.searches.pack()

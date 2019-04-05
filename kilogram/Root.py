@@ -19,6 +19,12 @@ import AddPostPage
 import NotificationsPage
 import MyProfilePage
 import requests
+import EditProfile
+import ChangeUsername
+import ChangePassword
+import DM_Page
+#import ChangeProfilePicture
+#import CameraPage
 
 
 class Root(tk.Frame):
@@ -38,7 +44,7 @@ class Root(tk.Frame):
 		
 		#abc = test.PickFiles(self.canvas)
 	def connecttodatabase(self):
-		self.mydb = pymysql.connect(host="127.0.0.1",user="root",passwd="",db="kilogram")
+		self.mydb = pymysql.connect(host="192.168.1.9",user="root1",passwd="",db="kilogram")
 		self.mc = self.mydb.cursor()
 		return self.mc
 
@@ -380,26 +386,59 @@ class Root(tk.Frame):
 
 	def presssearchbutton1(self):
 		self.fusername = self.searchpage.search_entry.get()
-		sql = 'SELECT uid from user where username like "%s"'
+		self.searchpage = SearchPage.SearchPage(self)
+		sql = 'SELECT username from user where username like "%s"'
 		self.mc.execute(sql % ("%"+self.fusername+"%"))
-		uid = self.mc.fetchall()
-		uid = list(sum(uid, ()))
-		self.fuserli = []
-		for i in uid :
-			self.sql1 = 'SELECT username from user where uid = %s'
-			self.fusername = self.mc.execute(self.sql1 % i)
-			self.fuser = self.mc.fetchall()
-			self.fuser = list(sum(self.fuser, ()))
-			self.fuserli.append(self.fuser)
+		self.unames = self.mc.fetchall()
+		self.unames = list(sum(self.unames, ()))
+		entry = {}
+		label = {}
 
-		print(self.fuserli)
-		msg = ''
-		for i in self.fuserli :
-			for j in self.fuserli[self.fuserli.index(i)]:
-				print(i)
-				msg = msg + i + '\n'
+		i = 0
+		for name in self.unames:
+			e = tk.Button(self.searchpage.frame,text = 'Follow')
+			e.grid(sticky='w')
+			entry[name] = e
 
-		self.searchpage.searches.configure(text = 'msg')
+			lb = tk.Label(self.searchpage.frame, text=name, bg = 'white')
+			lb.grid(row=i, column=1)
+			label[name] = lb
+			i += 1
+		# for i in uid :
+		# 	self.sql1 = 'SELECT username from user where uid = %s'
+		# 	self.fusername = self.mc.execute(self.sql1 % i)
+		# 	self.fuser = self.mc.fetchall()
+		# 	self.fuser = list(sum(self.fuser, ()))
+		# 	self.fuserli.append(self.fuser)
+
+		# print(self.fuserli)
+		# msg = ''
+		# for i in self.fuserli :
+		# 	for j in self.fuserli[self.fuserli.index(i)]:
+		# 		print(i)
+		# 		msg = msg + i + '\n'
+
+		# self.searchpage.searches.configure(text = 'msg')
+
+	def presssearchbutton3(self):
+		self.fusername = self.dmpage.searchuser_entry.get()
+		sql = 'SELECT username from user where username like "%s"'
+		self.mc.execute(sql % ("%"+self.fusername+"%"))
+		self.unames = self.mc.fetchall()
+		self.unames = list(sum(self.unames, ()))
+		entry = {}
+		label = {}
+
+		i = 0
+		for name in self.unames:
+			e = tk.Button(self.dmpage.frame,text = 'Follow')
+			e.grid(sticky='w')
+			entry[name] = e
+
+			lb = tk.Label(self.dmpage.frame, text=name, bg = 'white')
+			lb.grid(row=i, column=1)
+			label[name] = lb
+			i += 1
 		
 
 
@@ -410,6 +449,7 @@ class Root(tk.Frame):
 		self.notificationspage = NotificationsPage.NotificationsPage(self)
 
 	def pressmyprofilebutton(self):
+		self.navbar = LowerNavbar.Lowernavbar(self)
 		self.myprofilepage = MyProfilePage.MyProfilePage(self)
 		self.mc = self.connecttodatabase()
 		self.mc.execute("Select count(uid) from friends where uid = %s "%(self.uid))
@@ -432,6 +472,53 @@ class Root(tk.Frame):
 	def presslogoutbutton(self):
 		self.loginpage = Login_page.Login_page(self)
 
+	def presseditprofilebutton(self):
+		self.editprofile = EditProfile.EditProfile(self)
+
+	def presschangeusernamebutton(self):
+		self.changeusername = ChangeUsername.ChangeUsername(self)
+
+	def presschangepasswordbutton(self):
+		self.changepassword = ChangePassword.ChangePassword(self)
+
+	def presschangeprofilepicturebutton(self):
+		self.changeprofilepicture = ChangeProfilePicture.ChangeProfilePicture(self)
+
+	def presschangeusernamebutton1(self):
+		newusername = self.changeusername.newusername_entry.get()
+		if self.username == newusername:
+			self.editprofile = EditProfile.EditProfile(self)
+			self.editprofile.usernamechangesuccessful_label.configure(text = "Entered username is the same as before",fg = "red")
+		else:
+			sql = "UPDATE user set username = '%s' where username = '%s'"
+			args = (newusername,self.username)
+			self.mc.execute(sql % args)
+			self.mydb.commit()
+			self.username = newusername
+			self.editprofile = EditProfile.EditProfile(self)
+			self.editprofile.usernamechangesuccessful_label.configure(text = "Username changed successfully",fg= "green")
+
+	def presschangepasswordbutton1(self): 
+		newpassword = self.changepassword.newpassword_entry.get()
+		confirmpassword = self.changepassword.confirmpassword_entry.get()
+		flag = 0
+		if newpassword == '':
+			self.changepassword.changepasswordunsuccessful_label.configure(text = "Password cannot be empty.",fg = "red")
+		else:
+			if newpassword == confirmpassword:
+				sql = "UPDATE auth set passwd = '%s' where uid = %s"
+				args = (confirmpassword,self.uid)
+				self.mc.execute(sql %args)
+				self.mydb.commit()
+				self.editprofile = EditProfile.EditProfile(self)
+				self.editprofile.usernamechangesuccessful_label.configure(text = "Password changed successfully",fg= "green")
+			else:
+				self.changepassword.newpassword_entry.configure(text = "")
+				self.changepassword.confirmpassword_entry.configure(text = "") 
+				self.changepassword.changepasswordunsuccessful_label.configure(text = "Passwords doesn't match.",fg = "red")
+
+	def pressmessagebutton(self):
+		self.dmpage = DM_Page.DM_Page(self)
 
 
 if __name__=='__main__':
