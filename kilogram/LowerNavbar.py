@@ -19,10 +19,10 @@ class Lowernavbar:
 		title_label = tk.Label(uppernavbarframe , anchor = 'center',text = "Kilogram",fg = "white",height=55,bg="black",font = ('Zefani',35))
 		title_label.place(relwidth = 0.3,relheight = 0.98 ,relx = 0.32,rely = 0.01)
 
-		messagebutton = tk.Button(uppernavbarframe,text = 'DM',bg = 'white',command = master.pressmessagebutton)
+		messagebutton = tk.Button(uppernavbarframe,text = 'DM',bg = 'black',fg = "white",bd = 0,command = master.pressmessagebutton)
 		messagebutton.place(relwidth = 0.075,relheight = 0.7,relx = 0.915,rely=0.15)
 
-		camerabutton = tk.Button(uppernavbarframe,text = 'Camera',bg = 'white',height=2,width=20)
+		camerabutton = tk.Button(uppernavbarframe,text = 'Camera',bg = 'black',fg = 'white',bd = 0,height=2,width=20)
 		camerabutton.place(relwidth = 0.075,relheight = 0.7,relx=0.01,rely = 0.15)
 
 		self.midframe = tk.Frame(master.canvas,bg = 'white')

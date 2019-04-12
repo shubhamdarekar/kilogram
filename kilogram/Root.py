@@ -27,6 +27,8 @@ import DM_Page
 from tkinter import filedialog
 from PIL import ImageTk, Image
 import AddCaptionPage
+import Chat
+import EnterPassword
 #import ChangeProfilePicture
 #import CameraPage
 
@@ -48,7 +50,7 @@ class Root(tk.Frame):
 		
 		#abc = test.PickFiles(self.canvas)
 	def connecttodatabase(self):
-		self.mydb = pymysql.connect(host="192.168.1.9",user="root1",passwd="",db="kilogram")
+		self.mydb = pymysql.connect(host="localhost",user="root",passwd="",db="kilogram")
 		self.mc = self.mydb.cursor()
 		return self.mc
 
@@ -107,13 +109,6 @@ class Root(tk.Frame):
 		return OTP
 
 	def presssignup1(self):
-		self.signuppage.firstnameempty.configure(text = '')
-		self.signuppage.lastnameempty.configure(text = '')
-		self.signuppage.emailempty.configure(text = '')
-		self.signuppage.phonenoempty.configure(text = '')
-		self.signuppage.usernameempty.configure(text = '')
-		self.signuppage.passwordempty.configure(text = '')
-		self.signuppage.confirmpasswordempty.configure(text = '')
 		fname = self.signuppage.firstnameentry.get()
 		lname = self.signuppage.lastnameentry.get()
 		age = self.signuppage.strvar.get()
@@ -123,6 +118,13 @@ class Root(tk.Frame):
 		password = self.signuppage.passwordentry.get()
 		cnfpassword = self.signuppage.confirmpasswordentry.get()
 		#print(fname,lname,age,email,phnno,password)
+		self.signuppage.firstnameempty.configure(text = '')
+		self.signuppage.lastnameempty.configure(text = '')
+		self.signuppage.emailempty.configure(text = '')
+		self.signuppage.phonenoempty.configure(text = '')
+		self.signuppage.usernameempty.configure(text = '')
+		self.signuppage.passwordempty.configure(text = '')
+		self.signuppage.confirmpasswordempty.configure(text = '')		
 		flag = 1
 		if fname == '':
 			self.signuppage.firstnameempty.configure(text = 'First name Cannot be Empty!!!')
@@ -394,20 +396,41 @@ class Root(tk.Frame):
 		sql = 'SELECT username from user where username like "%s"'
 		self.mc.execute(sql % ("%"+self.fusername+"%"))
 		self.unames = self.mc.fetchall()
-		self.unames = list(sum(self.unames, ()))
-		entry = {}
-		label = {}
 
-		i = 0
-		for name in self.unames:
-			e = tk.Button(self.searchpage.frame,text = 'Follow')
-			e.grid(sticky='w')
-			entry[name] = e
 
-			lb = tk.Label(self.searchpage.frame, text=name, bg = 'white')
-			lb.grid(row=i, column=1)
-			label[name] = lb
-			i += 1
+		if self.unames == 0:
+			label = tk.Label(self.searchpage.frame,text = "No users found",bg = "white",fg = "black",font = ('bold',20))
+			label.place(relwidth = 1,reheight = 0.1, rely = 0.4)
+		else:
+			self.unames = list(sum(self.unames, ())) 
+			entry = {}
+			label = {}
+
+			i = 0
+			for name in self.unames:
+				e = tk.Button(self.searchpage.frame,text = 'Follow')
+				e.grid(sticky='w')
+				entry[name] = e
+
+				lb = tk.Label(self.searchpage.frame, text=name, bg = 'white')
+				lb.grid(row=i, column=1)
+				label[name] = lb
+				i += 1
+
+		# self.unames = list(sum(self.unames, ()))
+		# entry = {}
+		# label = {}
+
+		# i = 0
+		# for name in self.unames:
+		# 	e = tk.Button(self.searchpage.frame,text = 'Follow')
+		# 	e.grid(sticky='w')
+		# 	entry[name] = e
+
+		# 	lb = tk.Label(self.searchpage.frame, text=name, bg = 'white')
+		# 	lb.grid(row=i, column=1)
+		# 	label[name] = lb
+		# 	i += 1
 		# for i in uid :
 		# 	self.sql1 = 'SELECT username from user where uid = %s'
 		# 	self.fusername = self.mc.execute(self.sql1 % i)
@@ -424,25 +447,25 @@ class Root(tk.Frame):
 
 		# self.searchpage.searches.configure(text = 'msg')
 
-	def presssearchbutton3(self):
-		self.fusername = self.dmpage.searchuser_entry.get()
-		sql = 'SELECT username from user where username like "%s"'
-		self.mc.execute(sql % ("%"+self.fusername+"%"))
-		self.unames = self.mc.fetchall()
-		self.unames = list(sum(self.unames, ()))
-		entry = {}
-		label = {}
+	# def presssearchbutton3(self):
+	# 	self.fusername = self.dmpage.searchuser_entry.get()
+	# 	sql = 'SELECT username from user where username like "%s"'
+	# 	self.mc.execute(sql % ("%"+self.fusername+"%"))
+	# 	self.unames = self.mc.fetchall()
+	# 	self.unames = list(sum(self.unames, ()))
+	# 	entry = {}
+	# 	label = {}
 
-		i = 0
-		for name in self.unames:
-			e = tk.Button(self.dmpage.frame,text = 'Follow')
-			e.grid(sticky='w')
-			entry[name] = e
+	# 	i = 0
+	# 	for name in self.unames:
+	# 		e = tk.Button(self.dmpage.frame,text = 'Follow')
+	# 		e.grid(sticky='w')
+	# 		entry[name] = e
 
-			lb = tk.Label(self.dmpage.frame, text=name, bg = 'white')
-			lb.grid(row=i, column=1)
-			label[name] = lb
-			i += 1
+	# 		lb = tk.Label(self.dmpage.frame, text=name, bg = 'white')
+	# 		lb.grid(row=i, column=1)
+	# 		label[name] = lb
+	# 		i += 1
 		
 
 
@@ -529,7 +552,148 @@ class Root(tk.Frame):
 		self.changeusername = ChangeUsername.ChangeUsername(self)
 
 	def presschangepasswordbutton(self):
-		self.changepassword = ChangePassword.ChangePassword(self)
+		self.enterpassword = EnterPassword.EnterPassword(self)
+		# self.changepassword = ChangePassword.ChangePassword(self)
+
+	def presschangepasswordbutton2(self):
+		password = self.enterpassword.enterpassword_entry.get()
+		sql = "SELECT passwd from auth where uid = %s"
+		self.mc.execute(sql % self.uid) 
+		result = self.mc.fetchall()
+		result = sum(result,())
+		print(result)
+		if password == result[0]:
+			self.editprofile = EditProfile.EditProfile(self)
+			self.changepassword = ChangePassword.ChangePassword(self)
+		else : 
+			self.enterpassword.msg_label.configure(text = "Incorrect Password",fg = "red")
+
+	def pressmessagebutton(self):
+		self.dmpage = DM_Page.DM_Page(self)	
+
+	def myprofilebutton1(self):
+		self.myprofile = MyProfilePage.MyProfilePage(self)
+
+	# def pressreceivebutton(self):
+	# 	self.pressmessagebutton1()
+
+	def pressmessagebutton1(self):
+		self.chat = Chat.Chat(self)
+		sql = "SELECT uid from user where username = '%s'"
+		self.mc.execute(sql % self.fusername)
+		self.r = self.mc.fetchall() 
+		self.r = list(sum(self.r , ()))
+
+		sql1 = "SELECT msg from msgs where uid = %s AND fuid = %s"
+		args = (self.uid,self.r)
+		self.mc.execute(sql1,args)
+		messages = self.mc.fetchall()
+		messages = list(sum(messages,()))
+
+		sql1 = "SELECT mid from msgs where uid = %s AND fuid = %s"
+		args = (self.uid,self.r)
+		self.mc.execute(sql1,args)
+		myid = self.mc.fetchall()
+		myid = list(sum(myid,()))
+		myuid = []
+		for i in range(len(myid)):
+			myuid.append(self.uid)
+		# print(myuid)
+		# print(messages)
+		# print(myid)
+
+		me = list(map(list,zip(myuid,myid,messages)))
+		# print(me)
+
+		sql2 = "SELECT msg from msgs where uid = %s AND fuid = %s"
+		self.mc.execute(sql2 % (self.r[0],self.uid))
+		messages1 = self.mc.fetchall()
+		messages1 = list(sum(messages1,())) 
+		# print(messages1)
+
+		sql2 = "SELECT mid from msgs where uid = %s AND fuid = %s"
+		self.mc.execute(sql2 % (self.r[0],self.uid))
+		myid1 = self.mc.fetchall()
+		myid1 = list(sum(myid1,())) 
+		fuid = []
+		for i in range(len(myid1)):
+			fuid.append(self.r[0])
+		# print(fuid)
+		# print(messages1)
+		# print(myid1)
+
+		her = list(map(list,zip(fuid,myid1,messages1)))
+		# print(her)
+
+		z = me + her
+		z = sorted(z,key=lambda l:l[1])
+		# print(z)
+
+		j = 0.05
+		k = 0.1
+		for m in z:
+			if m[0] == self.r[0]:
+				self.label_from = tk.Label(self.chat.mid_frame,bg = "black",fg = "white",text = m[2])
+				self.label_from.place(relwidth = 0.3,relheight = 0.07,relx = 0.08,rely = k)
+				j+=0.14
+				k+=0.09
+			else :
+				self.label_to = tk.Label(self.chat.mid_frame,bg = "black",fg = "white",text = m[2])
+				self.label_to.place(relwidth = 0.3,relheight = 0.07,relx = 0.68,rely = j)
+				j+=0.09
+				k+=0.14
+
+		# i=0
+		# d=0
+		# j = 0.05
+		# k = 0.1
+		# for msg in messages:
+		# 	self.label_to = tk.Label(self.chat.mid_frame,bg = "black",fg = "white",text = msg)
+		# 	self.label_to.place(relwidth = 0.3,relheight = 0.07,relx = 0.68,rely = j)
+
+		# 	if(len(messages1) > i ):
+		# 		self.label_from = tk.Label(self.chat.mid_frame,bg = "black",fg = "white",text = messages1[d])
+		# 		d+=1
+		# 		self.label_from.place(relwidth = 0.3,relheight = 0.07,relx = 0.08,rely = k)
+		# 	else:
+		# 		pass
+
+		# 	i += 1
+		# 	j += 0.1
+		# 	k += 0.1
+
+	def pressbackbutton(self):
+		self.navbar = LowerNavbar.Lowernavbar(self)
+		self.dmpage= DM_Page.DM_Page(self)
+		#self.lowernavbar = LowerNavbar.Lowernavbar(self)
+
+	def presssearchbutton3(self):
+		# print("Hiis")
+		self.fusername = self.dmpage.searchuser_entry.get()
+		sql = 'SELECT username from user where username = "%s"'
+		self.mc.execute(sql % self.fusername)
+		self.unames = self.mc.fetchall()
+		self.unames = list(sum(self.unames, ()))
+		entry = {}
+		i = 0
+		j = 0.05
+		for name in self.unames:
+			self.e = tk.Button(self.dmpage.frame,text = self.unames[i],bg = "black",fg = "white",command = self.pressmessagebutton1)
+			self.e.place(relheight = 0.1,relwidth = 1,rely = j)
+			entry[name] =self.e
+			j += 0.12
+			i += 1
+
+	def presssendbutton(self):
+		self.msg = self.chat.message_entry.get()
+		if(self.msg=='' or self.msg == 'Enter here'):
+			self.chat.message_entry.configure(text = 'Enter here')
+		else:
+			sql = "INSERT into msgs(uid,fuid,msg) values(%s,%s,'%s')"
+			args = (self.uid,self.r[0],self.msg)
+			self.mc.execute(sql%args)
+			self.mydb.commit()
+			self.pressmessagebutton1()
 
 	def presschangeprofilepicturebutton(self):
 		self.changeprofilepicture = ChangeProfilePicture.ChangeProfilePicture(self)
@@ -592,6 +756,28 @@ class Root(tk.Frame):
 		self.mydb.commit()
 
 		self.pressmyprofilebutton()
+
+	def friendchat_profile(self):
+		self.navbar = LowerNavbar.Lowernavbar(self)
+		self.myprofilepage = MyProfilePage.MyProfilePage(self)
+		self.mc = self.connecttodatabase()
+		self.mc.execute("Select count(uid) from friends where uid = %s "%(self.r[0]))
+		self.following = self.mc.fetchall()
+		self.following = list(sum(self.following, ()))
+		self.myprofilepage.followingnumber.configure(text = self.following[0])
+
+		self.mc.execute("Select count(fuid) from friends where fuid = %s "%(self.r[0]))
+		self.followers = self.mc.fetchall()
+		self.followers = list(sum(self.followers, ()))
+		self.myprofilepage.followernumber.configure(text = self.followers[0])
+
+		self.mc.execute("Select count(uid) from posts where uid = %s "%(self.r[0]))
+		self.post = self.mc.fetchall()
+		self.post = list(sum(self.post, ()))
+		self.myprofilepage.postnumber.configure(text = self.post[0])
+
+		self.myprofilepage.username1label.configure(text = self.username)
+
 
        	
 if __name__=='__main__':

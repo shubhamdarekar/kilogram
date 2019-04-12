@@ -2,7 +2,7 @@ import tkinter as tk
 class ChangePassword(tk.Frame):
  	def __init__(self,master):
 
- 		mainchangepassword_frame = tk.Frame(master.editprofile.maineditprofile_frame,bg = "white")
+ 		mainchangepassword_frame = tk.Frame(master.canvas,bg = "white")
  		mainchangepassword_frame.place(relwidth = 1,relheight = 1)
 
  		self.changepasswordunsuccessful_label = tk.Label(mainchangepassword_frame,bg = "white",text = "")

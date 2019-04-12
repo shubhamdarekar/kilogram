@@ -14,7 +14,7 @@ class SearchPage(tk.Frame):
 		self.search_entry = tk.Entry(searchpage_frame,bg = "#ECECEC")
 		self.search_entry.place(relwidth = 0.38, relheight = 0.04,relx = 0.3,rely = 0.07)
 
-		self.search_button = tk.Button(searchpage_frame,bg = "white",text = "Search",command = master.presssearchbutton1)
+		self.search_button = tk.Button(searchpage_frame,bg = "black",fg = "white",text = "Search",command = master.presssearchbutton1)
 		self.search_button.place(relwidth = 0.1,relheight = 0.04,relx = 0.7,rely= 0.067)
 
 		self.frame = tk.Frame(searchpage_frame,bg = "white")
