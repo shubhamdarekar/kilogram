@@ -628,9 +628,11 @@ class Root(tk.Frame):
 		z = me + her
 		z = sorted(z,key=lambda l:l[1])
 		# print(z)
+		if len(z) > 7:
+			z = z[-7:len(z)]
 
 		j = 0.05
-		k = 0.1
+		k = 0.08
 		for m in z:
 			if m[0] == self.r[0]:
 				self.label_from = tk.Label(self.chat.mid_frame,bg = "black",fg = "white",text = m[2])
