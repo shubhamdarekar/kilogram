@@ -30,6 +30,10 @@ from PIL import ImageTk, Image
 import AddCaptionPage
 import Chat
 import EnterPassword
+import numpy as np
+import urllib
+from skimage import io
+import cv2
 #import ChangeProfilePicture
 #import CameraPage
 
@@ -47,6 +51,7 @@ class Root(tk.Frame):
 		self.pack()
 		self.canvas = tk.Canvas(root,height=700,width=1080,bg="white").pack()
 		self.loginpage = Login_page.Login_page(self)
+		
 
 		
 		#abc = test.PickFiles(self.canvas)
@@ -519,6 +524,41 @@ class Root(tk.Frame):
 		self.image = self.mc.fetchall()
 		self.image = list(sum(self.image, ()))
 		print(self.image)
+		self.index = 0
+		if len(self.image)>=0:
+			self.nextbutton()
+		else:
+			self.myprofilepage.imagelabel.configure(text = 'No More Images')
+			
+
+	def nextbutton(self):
+		if(self.index<len(self.image)-1):
+			image = io.imread(self.image[self.index])
+			self.index+=1
+			image = Image.fromarray(image)
+			image = ImageTk.PhotoImage(image)
+			self.myprofilepage.imagelabel.configure(image = image)
+			self.mainloop()
+		else:
+			self.myprofilepage.imagelabel.configure(image = '',text = 'No More Images,Press Previous',fg = 'red')
+
+	def prevbutton(self):
+		if(self.index>=0):
+			self.index-=1
+			image = io.imread(self.image[self.index])
+			image = Image.fromarray(image)
+			image = ImageTk.PhotoImage(image)
+			self.myprofilepage.imagelabel.configure(image = image)
+			self.mainloop()
+		else:
+			self.myprofilepage.imagelabel.configure(image = '',text = 'No More Images,Press Next',fg = 'red')
+
+
+
+
+
+
+
 		#self.myprofilepage.imagepost_frame.configure(image = img)
 		# self.image = self.mc.fetchall()
 		# self.image = list(sum(self.image,()))

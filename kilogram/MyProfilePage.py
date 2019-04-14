@@ -2,6 +2,8 @@ import tkinter as tk
 
 class MyProfilePage(tk.Frame):
 	def __init__(self,master):
+		global index
+		index = 0
 		mainprofileframe = tk.Frame(master.navbar.midframe,bg = 'white')
 		mainprofileframe.place(relheight = '1',relwidth = 1)
 
@@ -46,5 +48,14 @@ class MyProfilePage(tk.Frame):
 
 		imagepost_frame = tk.Frame(mainprofileframe, bg = 'white',relief='sunken')
 		imagepost_frame.place(height=400,width=650, relx = 0.167, rely =0.38)
+
+		self.imagelabel = tk.Label(imagepost_frame,bg = 'white')
+		self.imagelabel.place(relheight = 0.8,relwidth=1)
+
+		self.nextbutton = tk.Button(imagepost_frame,bg = 'black',command =master.nextbutton,text = 'Next' ,fg = 'White')
+		self.nextbutton.place(relx = 0.7,rely = 0.84)
+
+		self.prevbutton = tk.Button(imagepost_frame,bg = 'black',command =master.prevbutton,text = 'Previous' ,fg = 'White')
+		self.prevbutton.place(relx = 0.4,rely = 0.84)
 
 
