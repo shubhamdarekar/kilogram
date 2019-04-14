@@ -5,6 +5,7 @@ import Login_page
 import Signup
 # import urllib.request
 # import urllib.parse
+import pyrebase
 import smtplib
 import LowerNavbar
 import pymysql
@@ -515,9 +516,10 @@ class Root(tk.Frame):
 		args = (self.uid)
 		self.mc.execute(sql,args)
 		self.mydb.commit()
-		self.image = self.mc.fetchone()
-		img = tk.PhotoImage(data = self.image)
-		self.myprofilepage.imagepost_frame.configure(image = img)
+		self.image = self.mc.fetchall()
+		self.image = list(sum(self.image, ()))
+		print(self.image)
+		#self.myprofilepage.imagepost_frame.configure(image = img)
 		# self.image = self.mc.fetchall()
 		# self.image = list(sum(self.image,()))
 		# print(len(self.image))
@@ -749,14 +751,36 @@ class Root(tk.Frame):
 	def upload(self):
 		self.cap = self.addcaptionpage.captionbox.get()
 
-		with open(self.filepath, 'rb') as file:
-			binaryData = file.read()
-    		
-		sql = 'INSERT into posts(uid,imgs,tags,caption) values ("%s","%s","%s","%s")'
-		args = (self.uid,binaryData,self.uid,self.cap)
+		sql = "SELECT pid from posts"
+		self.mc.execute(sql)
+
+		pids = self.mc.fetchall()
+		pids = list(sum(pids, ()))
+		if len(pids)==0:
+			pid = 0
+		else:
+			pid = max(pids)
+			pid+=1
+
+		config = {
+		"apiKey": "AIzaSyBpHBfhyDCJPD_iXFGbR1zD9K0wyduh4rE",
+		"authDomain": "kilogramlikeinstagram.firebaseapp.com",
+		"databaseURL": "https://kilogramlikeinstagram.firebaseio.com",
+		"projectId": "kilogramlikeinstagram",
+		"storageBucket": "kilogramlikeinstagram.appspot.com",
+		"messagingSenderId": "334961156944"
+		}
+		firebase = pyrebase.initialize_app(config)
+		storage = firebase.storage()
+		print(self.filepath)
+		storage.child("images/%s.png"%(pid)).put(self.filepath)
+		uploadurl = storage.child("images/new1.jpg").get_url(None)
+		print(uploadurl)
+
+		sql = "INSERT into posts values(%s,%s,%s,%s,%s)"
+		args=(self.uid,pid,uploadurl,self.uid,self.cap)
 		self.mc.execute(sql,args)
 		self.mydb.commit()
-
 		self.pressmyprofilebutton()
 
 	def friendchat_profile(self):
