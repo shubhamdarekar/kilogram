@@ -22,7 +22,7 @@ class Lowernavbar:
 		messagebutton = tk.Button(uppernavbarframe,text = 'DM',bg = 'black',fg = "white",bd = 0,command = master.pressmessagebutton)
 		messagebutton.place(relwidth = 0.075,relheight = 0.7,relx = 0.915,rely=0.15)
 
-		camerabutton = tk.Button(uppernavbarframe,text = 'Camera',bg = 'black',fg = 'white',bd = 0,height=2,width=20)
+		camerabutton = tk.Button(uppernavbarframe,text = 'Camera',bg = 'black',fg = 'white',bd = 0,height=2,width=20,command = master.presscamerabutton)
 		camerabutton.place(relwidth = 0.075,relheight = 0.7,relx=0.01,rely = 0.15)
 
 		self.midframe = tk.Frame(master.canvas,bg = 'white')

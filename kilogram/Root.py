@@ -74,10 +74,10 @@ class Root(tk.Frame):
 			fr = f.read()
 		except URLError :
 			pass
-
-
 		return(fr)
 	#https://maker.ifttt.com/trigger/{event}/with/key/iPUGsUMmzf9dS90kfOlajV45ZiaYPlDKV-bFvelUqh9
+	def presscamerabutton(self):
+		self.camerapage = CameraPage.CameraPage(self)
 	def sendemail(self,emailid, otp):
 	    # report = {}
 	    # report["value1"] = emailid
@@ -383,15 +383,104 @@ class Root(tk.Frame):
 				self.passwordli = self.mc.fetchall()
 				self.passwordli = list(sum(self.passwordli, ()))
 				if password in self.passwordli:
-					self.navbar = LowerNavbar.Lowernavbar(self)
-					self.homepage = HomePage.HomePage(self)
+					# self.navbar = LowerNavbar.Lowernavbar(self)
+					# self.homepage = HomePage.HomePage(self)
+					self.presshomebutton()
 				else :
 					self.loginpage.passwordempty.configure(text = 'Password is incorrect!!!')
 					self.loginpage.passwordentry.delete(0,100)
 
 
 	def presshomebutton(self):
+		self.navbar = LowerNavbar.Lowernavbar(self)
 		self.homepage = HomePage.HomePage(self)
+
+		sql = 'SELECT fuid from friends where uid = "%s"'
+		args =self.uid
+		self.mc = self.connecttodatabase()
+		self.mc.execute(sql,args)
+		friends = self.mc.fetchall()
+		friends = list(sum(friends, ()))
+
+		pids = []
+		for f in friends:
+			sql = 'SELECT pid from posts where uid = %s'
+			self.mc.execute(sql,f)
+			p = self.mc.fetchall()
+			p = list(sum(p, ()))
+			pids.append(p)
+
+		pids = sorted(pids,'reverse')
+		print(pids)
+
+		uids = []
+		imm = []
+		for p in pids:
+			sql = 'SELECT uid from posts where pid = %s'
+			self.mc.execute(sql,p)
+			g = self.mc.fetchall()
+			g = list(sum(g, ()))
+			uids.append(g)
+
+			sql = 'SELECT imgs from posts where pid = %s'
+			self.mc.execute(sql,p)
+			im = self.mc.fetchall()
+			im = list(sum(im, ()))
+			imm.append(im)
+
+		abc = list(map(list,zip(uid,pid,imm)))
+		print(abc)
+
+		self.index2 = 0
+
+		if len(abc)>0:
+			self.nextpost1()
+		else:
+			self._toggle_state(self.homepage.nextbutton,'disabled')
+			self._toggle_state(self.homepage.prevbutton,'disabled')
+			self.homepage.imagelabel.configure(text = 'No Images Try to follow few people.')
+
+	def nextbutton1(self):
+		self._toggle_state(self.homepage.prevbutton,'enabled')
+		self.index1+=1
+		self.nextpost1()
+		
+
+	def prevbutton1(self):
+		self._toggle_state(self.myprofilepage.nextbutton,'enabled')
+		self.index1-=1
+		self.prevpost()
+		
+
+	def nextpost1(self):
+		if(self.index1<=len(self.image)-1 and self.index1>=0):
+			image = io.imread(self.image[self.index1])
+			image = Image.fromarray(image)
+			image = ImageTk.PhotoImage(image)
+			self.myprofilepage.imagelabel.configure(image = image)
+			self.mainloop()
+		elif self.index<0:
+			self._toggle_state(self.myprofilepage.nextbutton,'disabled')
+			self.myprofilepage.imagelabel.configure(image = '',text = 'Press Next once more',fg = 'red')
+		else:
+			self._toggle_state(self.myprofilepage.nextbutton,'disabled')
+			self.myprofilepage.imagelabel.configure(image = '',text = 'No More Images,Press Previous',fg = 'red')
+
+	def prevpost1(self):
+		if(self.index1>=0 and self.index1<=len(self.image)-1):
+			image = io.imread(self.image[self.index1])
+			image = Image.fromarray(image)
+			image = ImageTk.PhotoImage(image)
+			self.myprofilepage.imagelabel.configure(image = image)
+			self.mainloop()
+		elif self.index>len(self.image)-1:
+			self._toggle_state(self.myprofilepage.prevbutton,'disabled')
+			self.myprofilepage.imagelabel.configure(image = '',text = 'Press Previous once more',fg = 'red')
+		else:
+			self._toggle_state(self.myprofilepage.prevbutton,'disabled')
+			self.myprofilepage.imagelabel.configure(image = '',text = 'No More Images,Press Next',fg = 'red')
+			
+
 
 	def presssearchbutton(self):
 		self.searchpage = SearchPage.SearchPage(self)
@@ -526,7 +615,7 @@ class Root(tk.Frame):
 
 	def pressaddpostbutton1(self):
 		self.filepath = ''
-		self.filepath = filedialog.askopenfilename()
+		self.filepath = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("png files","*.png"),("all files","*.*")))
 		self.addpostpage = AddPostPage.AddPostPage(self)
 		try:
 			img =tk.PhotoImage(file = self.filepath)
@@ -537,10 +626,11 @@ class Root(tk.Frame):
 		else:
 			self.addpostpage.filelabel.configure(image = img)
 		self.mainloop()
-		# self.addpostpage.filelabel.configure(image = image)
+		#self.addpostpage.filelabel.configure(image = image)
 
 	def pressnotificationsbutton(self):
 		self.notificationspage = NotificationsPage.NotificationsPage(self)
+		self.notifications()
 
 	def pressmyprofilebutton(self):
 		self.navbar = LowerNavbar.Lowernavbar(self)
@@ -930,14 +1020,66 @@ class Root(tk.Frame):
 		self.myprofilepage.edit_button.configure(state = "disabled",bg = "white",bd = 0)
 		self.myprofilepage.logout_button.configure(state = "disabled",bg = "white",bd = 0)
 
+	def notifications(self):
+		sql = "SELECT fid from friends where fuid = %s"
+		args = (self.uid)
+		self.mc.execute(sql%args)
+		fid = self.mc.fetchall()
+		fid = list(sum(fid,()))
+		
+		sql = "SELECT uid from friends where fuid = %s"
+		args = (self.uid)
+		self.mc.execute(sql%args)
+		ffuid = self.mc.fetchall()
+		ffuid = list(sum(ffuid,()))
 
-       	
+		sql = "SELECT fid from friends where uid = %s"
+		args = (self.uid)
+		self.mc.execute(sql%args)
+		fid1 = self.mc.fetchall()
+		fid1 = list(sum(fid1,()))
+		
+		sql = "SELECT uid from friends where uid = %s"
+		args = (self.uid)
+		self.mc.execute(sql%args)
+		ffuid1 = self.mc.fetchall()
+		ffuid1 = list(sum(ffuid1,()))
+	
+		friends = list(map(list,zip(fid,ffuid)))
+		friends1 = list(map(list,zip(fid1,ffuid1)))
+		print(friends1)
+
+		i = 0
+		w = len(friends1) - 1
+		j = 0.05
+		for k in friends:
+			self.mc.execute("SELECT username from user where uid IN (SELECT uid from friends where fuid = %s)" %  self.uid)
+			friends_name = self.mc.fetchall()
+			friends_name = list(sum(friends_name,()))
+			print(friends_name)
+			label = tk.Label(self.notificationspage.following_frame,bg = "white", fg = "black",text = "%s started following you!" % friends_name[w])
+			label.place(relwidth = 0.8,relheight = 0.05,relx = 0.1, rely = j)
+			i+=1
+			j+=0.05
+
+		z = 0
+		for k in friends1:
+			self.mc.execute("SELECT username from user where uid IN (SELECT fuid from friends where uid = %s)" %  friends1[z][1])
+			friends_name = self.mc.fetchall()
+			friends_name = list(sum(friends_name,()))
+			print(friends_name)
+			label = tk.Label(self.notificationspage.followed_frame,bg = "white", fg = "black",text = "You started following %s!" % friends_name[w])
+			label.place(relwidth = 0.8,relheight = 0.05,relx = 0.1, rely = j)
+			i+=1
+			j+=0.05
+
+
+
 if __name__=='__main__':
 	# info = AppKit.NSBundle.mainBundle().infoDictionary()
 	# info['LSUIElement'] = True
 
 	root = tk.Tk()
 	r = Root(root)
-	#r._toggle_state(r.loginpage.kilogramlabel,'disabled')
+	# r._toggle_state(r.loginpage.kilogramlabel,'disabled')
 	r.mainloop()
-			

@@ -4,11 +4,11 @@ import cv2
 
 class CameraPage(tk.Frame):
 	def __init__(self,master):
-		maincameraframe = tk.Frame(master.navbar.midframe, bg = 'blue')
+		maincameraframe = tk.Frame(master.navbar.midframe, bg = 'white')
 		maincameraframe.place(relwidth = 1,relheight = 1)
 		cam = cv2.VideoCapture(0)
 
-		cv2.namedWindow("Press Spacebar to capture the image.")
+		#cv2.namedWindow("Press Spacebar to capture the image.")
 
 		img_counter = 0
 
@@ -25,7 +25,6 @@ class CameraPage(tk.Frame):
 				print("{} written!".format(img_name))
 				print("Image Captured.")
 				img_counter += 1
-				break
 		cam.release()
 		cv2.destroyAllWindows()
 

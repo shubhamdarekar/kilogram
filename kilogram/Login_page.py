@@ -26,7 +26,7 @@ class Login_page(tk.Frame):
 		kilogramlabel=tk.Label(login_frame,text='Kilogram',font=("Motnotype Corsiva", "50", "bold italic"), bg='white')
 		kilogramlabel.place(relx=0.2,rely=0.01,relwidth=0.6)
 
-		self.loginsuccesslabel = tk.Label(login_frame, text="", fg = 'green',bg="#ebedd7")
+		self.loginsuccesslabel = tk.Label(login_frame, text="", fg = 'green',bg="white")
 		self.loginsuccesslabel.place(relx = 0.4, rely =0.2)
 
 		usernamelabel = tk.Label(login_frame, text="Username",bg="white",font=("Times", "25", "bold italic") )

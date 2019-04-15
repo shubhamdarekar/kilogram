@@ -28,7 +28,7 @@ class Signup_page(tk.Frame):
 		# global mainlogin_frame
 
 		mainsignup_frame=tk.Frame(master.canvas,bg='white')
-		mainsignup_frame.pack()
+		mainsignup_frame.place(relx = 1,rely = 1)
 
 		signup_frame = tk.Frame(master.canvas,bg="white")
 		signup_frame.place(height = 500,width = 756,relx = 0.15,rely = 0.05)
@@ -114,11 +114,11 @@ class Signup_page(tk.Frame):
 		signup_button2= tk.Button(signup_frame,text = 'Send OTP to Mobile Number',command = master.presssignup1, bg='black', fg='white')
 		signup_button2.place(relx=0.3,rely=0.9,relwidth = 0.25)
 
-		signup_button3= tk.Button(signup_frame,text = 'Send Otp To Email Id',command = master.presssignup2, bg='black', fg='white',state = 'disabled')
+		signup_button3= tk.Button(signup_frame,text = 'Send Otp To Email Id',command = master.presssignup2, bg='black', fg='white')
 		signup_button3.place(relx=0.6,rely=0.9,relwidth = 0.25)
 
 		loginpage_frame = tk.Frame(master.canvas, bg = 'white',relief='raised')
-		loginpage_frame.place(height=70,width=756, relx = 0.15, rely =0.8 )
+		loginpage_frame.place(relheight=0.1,relwidth=0.7, relx = 0.15, rely =0.76 )
 
 		loginlabel = tk.Label(loginpage_frame,bg="white", text = "Already a User?",fg = 'green',font=("Times", "18", "bold italic"))
 		loginlabel.pack()
