@@ -34,7 +34,7 @@ class Lowernavbar:
 		homebutton = tk.Button(lowernavbarframe,text = "Home",bg = "black",fg = "white",height = 2,width = 30,command = master.presshomebutton,relief = "sunken",bd = 0)
 		homebutton.grid(row = 0 ,column = 0)
 
-		searchbutton = tk.Button(lowernavbarframe,text = "Search",bg = "black",fg = "white",height = 2,width = 30,command = master.presssearchbutton,relief = "sunken",bd = 0)
+		searchbutton = tk.Button(lowernavbarframe,text = "Follow",bg = "black",fg = "white",height = 2,width = 30,command = master.presssearchbutton,relief = "sunken",bd = 0)
 		searchbutton.grid(row = 0 ,column = 1)
 
 		addpostbutton = tk.Button(lowernavbarframe,text = "Add Post",bg = "black",fg = "white",height = 2,width = 29,command = master.pressaddpostbutton,relief = "sunken",bd = 0)

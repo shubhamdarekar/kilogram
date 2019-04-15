@@ -34,13 +34,13 @@ import numpy as np
 import urllib
 from skimage import io
 import cv2
+import tkinter.font
 #import ChangeProfilePicture
-#import CameraPage
+import CameraPage
 
 
 class Root(tk.Frame):
 	def __init__(self,master):
-		
 		tk.Frame.__init__(self,master)
 		self.master.resizable(False,False)
 		self.master.geometry('+100+20')
@@ -77,7 +77,7 @@ class Root(tk.Frame):
 
 
 		return(fr)
-#https://maker.ifttt.com/trigger/{event}/with/key/iPUGsUMmzf9dS90kfOlajV45ZiaYPlDKV-bFvelUqh9
+	#https://maker.ifttt.com/trigger/{event}/with/key/iPUGsUMmzf9dS90kfOlajV45ZiaYPlDKV-bFvelUqh9
 	def sendemail(self,emailid, otp):
 	    # report = {}
 	    # report["value1"] = emailid
@@ -99,9 +99,9 @@ class Root(tk.Frame):
 	def clickEscape(self,event):
 		self.master.destroy()
 
-	# def _toggle_state(self,widget,state):
-	# 	state = state if state in ('normal','disabled') else 'normal'
-	# 	widget.configure(state = state)
+	def _toggle_state(self,widget,state):
+		state = state if state in ('normal','disabled') else 'normal'
+		widget.configure(state = state)
 
 	def presssignup(self):
 		self.signuppage = Signup.Signup_page(self)
@@ -109,7 +109,7 @@ class Root(tk.Frame):
 	def generateOTP(self) : 
 		digits = "0123456789"
 		OTP = "" 
-		for i in range(4) : 
+		for i in range(6) : 
 			OTP += digits[math.floor(random.random() * 10)] 
   
 		return OTP
@@ -397,31 +397,67 @@ class Root(tk.Frame):
 		self.searchpage = SearchPage.SearchPage(self)
 
 	def presssearchbutton1(self):
+		# self.fusername = self.searchpage.search_entry.get()
+		# self.searchpage = SearchPage.SearchPage(self)
+		# sql = 'SELECT username from user where username like "%s"'
+		# self.mc.execute(sql % ("%"+self.fusername+"%"))
+		# self.unames = self.mc.fetchall()
+
+
+		# if self.unames == 0:
+		# 	label = tk.Label(self.searchpage.frame,text = "No users found",bg = "white",fg = "black",font = ('bold',20))
+		# 	label.place(relwidth = 1,reheight = 0.1, rely = 0.4)
+		# else:
+		# 	self.unames = list(sum(self.unames, ())) 
+		# 	entry = {}
+		# 	label = {}
+
+		# 	i = 0
+		# 	for name in self.unames:
+		# 		e = tk.Button(self.searchpage.frame,text = 'Follow')
+		# 		e.grid(sticky='w')
+		# 		entry[name] = e
+
+		# 		lb = tk.Label(self.searchpage.frame, text=name, bg = 'white')
+		# 		lb.grid(row=i, column=1)
+		# 		label[name] = lb
+		# 		i += 1
+
 		self.fusername = self.searchpage.search_entry.get()
 		self.searchpage = SearchPage.SearchPage(self)
-		sql = 'SELECT username from user where username like "%s"'
-		self.mc.execute(sql % ("%"+self.fusername+"%"))
+		sql = 'SELECT username from user where username = "%s"'
+		self.mc.execute(sql % self.fusername)
 		self.unames = self.mc.fetchall()
+		self.unames = list(sum(self.unames, ()))
+		entry = {}
+		i = 0
+		j = 0.05
+		helv36 = tk.font.Font(family='Helvetica', size=30, weight='bold')
+		for name in self.unames:
+			self.e = tk.Button(self.searchpage.frame,font = helv36,text = "Follow "+self.unames[i],bg = "black",fg = "white",command = self.pressfollowbutton)
+			self.e.place(relheight = 0.1,relwidth = 1,rely = j)
+			entry[name] =self.e
+			j += 0.12
+			i += 1
 
+		sql = 'SELECT fuid from friends where uid = (SELECT uid from user where username = "%s")'
+		self.mc.execute(sql % self.username)
+		followers = self.mc.fetchall()
+		followers = list(sum(followers, ()))
+		print(followers)
+		sql = 'SELECT uid from user where username = "%s"'
+		self.mc.execute(sql % self.fusername)
+		self.d = self.mc.fetchall()
+		self.d = list(sum(self.d, ()))
+		print(self.d[0])
+		print(self.uid)
+		if(self.d[0] == self.uid):
+			self._toggle_state(self.e,'disabled')
+			self.e.configure(text = "You cannot follow yourself ")
+		elif(self.d[0] in followers):
+			self._toggle_state(self.e,'disabled')
+			self.e.configure(text = "You already follow "+self.unames[0])
 
-		if self.unames == 0:
-			label = tk.Label(self.searchpage.frame,text = "No users found",bg = "white",fg = "black",font = ('bold',20))
-			label.place(relwidth = 1,reheight = 0.1, rely = 0.4)
-		else:
-			self.unames = list(sum(self.unames, ())) 
-			entry = {}
-			label = {}
-
-			i = 0
-			for name in self.unames:
-				e = tk.Button(self.searchpage.frame,text = 'Follow')
-				e.grid(sticky='w')
-				entry[name] = e
-
-				lb = tk.Label(self.searchpage.frame, text=name, bg = 'white')
-				lb.grid(row=i, column=1)
-				label[name] = lb
-				i += 1
 
 		# self.unames = list(sum(self.unames, ()))
 		# entry = {}
@@ -472,8 +508,18 @@ class Root(tk.Frame):
 	# 		lb.grid(row=i, column=1)
 	# 		label[name] = lb
 	# 		i += 1
-		
+	def pressfollowbutton(self):
+		# sql = 'SELECT uid from user where username = "%s"'
+		# self.mc.execute(sql % self.fusername)
+		# self.d = self.mc.fetchall()
+		# self.d = list(sum(self.d, ()))
 
+		sql = 'INSERT into friends(uid,fuid) values(%s,%s)'
+		args=(self.uid,self.d[0])
+		self.mc.execute(sql ,args)
+		self.mydb.commit()
+		self._toggle_state(self.e,'disabled')
+		self.e.configure(text = "You are following %s"%(self.fusername))
 
 	def pressaddpostbutton(self):
 		self.addpostpage = AddPostPage.AddPostPage(self)
@@ -523,34 +569,52 @@ class Root(tk.Frame):
 		self.mydb.commit()
 		self.image = self.mc.fetchall()
 		self.image = list(sum(self.image, ()))
-		print(self.image)
 		self.index = 0
-		if len(self.image)>=0:
-			self.nextbutton()
+		if len(self.image)>0:
+			self.nextpost()
 		else:
-			self.myprofilepage.imagelabel.configure(text = 'No More Images')
+			self._toggle_state(self.myprofilepage.nextbutton,'disabled')
+			self._toggle_state(self.myprofilepage.prevbutton,'disabled')
+			self.myprofilepage.imagelabel.configure(text = 'No Images Upload from Add Post Page.')
 			
-
 	def nextbutton(self):
-		if(self.index<len(self.image)-1):
-			image = io.imread(self.image[self.index])
-			self.index+=1
-			image = Image.fromarray(image)
-			image = ImageTk.PhotoImage(image)
-			self.myprofilepage.imagelabel.configure(image = image)
-			self.mainloop()
-		else:
-			self.myprofilepage.imagelabel.configure(image = '',text = 'No More Images,Press Previous',fg = 'red')
+		self._toggle_state(self.myprofilepage.prevbutton,'enabled')
+		self.index+=1
+		self.nextpost()
+		
 
 	def prevbutton(self):
-		if(self.index>=0):
-			self.index-=1
+		self._toggle_state(self.myprofilepage.nextbutton,'enabled')
+		self.index-=1
+		self.prevpost()
+		
+
+	def nextpost(self):
+		if(self.index<=len(self.image)-1 and self.index>=0):
 			image = io.imread(self.image[self.index])
 			image = Image.fromarray(image)
 			image = ImageTk.PhotoImage(image)
 			self.myprofilepage.imagelabel.configure(image = image)
 			self.mainloop()
+		elif self.index<0:
+			self._toggle_state(self.myprofilepage.nextbutton,'disabled')
+			self.myprofilepage.imagelabel.configure(image = '',text = 'Press Next once more',fg = 'red')
 		else:
+			self._toggle_state(self.myprofilepage.nextbutton,'disabled')
+			self.myprofilepage.imagelabel.configure(image = '',text = 'No More Images,Press Previous',fg = 'red')
+
+	def prevpost(self):
+		if(self.index>=0 and self.index<=len(self.image)-1):
+			image = io.imread(self.image[self.index])
+			image = Image.fromarray(image)
+			image = ImageTk.PhotoImage(image)
+			self.myprofilepage.imagelabel.configure(image = image)
+			self.mainloop()
+		elif self.index>len(self.image)-1:
+			self._toggle_state(self.myprofilepage.prevbutton,'disabled')
+			self.myprofilepage.imagelabel.configure(image = '',text = 'Press Previous once more',fg = 'red')
+		else:
+			self._toggle_state(self.myprofilepage.prevbutton,'disabled')
 			self.myprofilepage.imagelabel.configure(image = '',text = 'No More Images,Press Next',fg = 'red')
 
 
@@ -739,8 +803,8 @@ class Root(tk.Frame):
 			self.mydb.commit()
 			self.pressmessagebutton1()
 
-	def presschangeprofilepicturebutton(self):
-		self.changeprofilepicture = ChangeProfilePicture.ChangeProfilePicture(self)
+	#def presschangeprofilepicturebutton(self):
+	#	self.changeprofilepicture = ChangeProfilePicture.ChangeProfilePicture(self)
 
 	def presschangeusernamebutton1(self):
 		newusername = self.changeusername.newusername_entry.get()
@@ -787,6 +851,26 @@ class Root(tk.Frame):
 			self.addcaptionpage.imagelabel.configure(image = img)
 			self.mainloop()
 
+	def presschangeprofilepicturebutton(self):
+		self.mc = self.connecttodatabase()
+		self.mc.execute('SELECT uid from profile')
+
+		uids = self.mc.fetchall()
+		uids=list(sum(uids, ()))
+		print(uids)
+
+		self.profilepath = ''
+		self.profilepath = filedialog.askopenfilename()
+		try:
+			img =tk.PhotoImage(file = self.profilepath)
+		except (tk.TclError):
+			self.myprofilepage.profilepic.configure(text = 'Please Upload a image png File.',fg = 'red')
+		else:
+			self.myprofilepage = MyProfilePage.MyProfilePage(self)
+			self.myprofilepage.profilepic.configure(image = img)
+			root.mainloop()
+
+
 
 	def upload(self):
 		self.cap = self.addcaptionpage.captionbox.get()
@@ -812,10 +896,8 @@ class Root(tk.Frame):
 		}
 		firebase = pyrebase.initialize_app(config)
 		storage = firebase.storage()
-		print(self.filepath)
 		storage.child("images/%s.png"%(pid)).put(self.filepath)
-		uploadurl = storage.child("images/new1.jpg").get_url(None)
-		print(uploadurl)
+		uploadurl = storage.child("images/%s.png"%(pid)).get_url(None)
 
 		sql = "INSERT into posts values(%s,%s,%s,%s,%s)"
 		args=(self.uid,pid,uploadurl,self.uid,self.cap)
@@ -842,7 +924,11 @@ class Root(tk.Frame):
 		self.post = list(sum(self.post, ()))
 		self.myprofilepage.postnumber.configure(text = self.post[0])
 
-		self.myprofilepage.username1label.configure(text = self.username)
+		self.mc.execute("SELECT username from user where uid = %s"%(self.r[0]))
+		self.friendname = self.mc.fetchall()
+		self.myprofilepage.username1label.configure(text = self.friendname)
+		self.myprofilepage.edit_button.configure(state = "disabled",bg = "white",bd = 0)
+		self.myprofilepage.logout_button.configure(state = "disabled",bg = "white",bd = 0)
 
 
        	
