@@ -32,6 +32,7 @@ import Chat
 import EnterPassword
 import numpy as np
 import urllib
+import urllib.error
 from skimage import io
 import cv2
 import tkinter.font
@@ -52,8 +53,6 @@ class Root(tk.Frame):
 		self.canvas = tk.Canvas(root,height=700,width=1080,bg="white").pack()
 		self.loginpage = Login_page.Login_page(self)
 		
-
-		
 		#abc = test.PickFiles(self.canvas)
 	def connecttodatabase(self):
 		self.mydb = pymysql.connect(host="localhost",user="root",passwd="",db="kilogram")
@@ -72,12 +71,31 @@ class Root(tk.Frame):
 			request = urllib.request.Request("https://api.txtlocal.com/send/?")
 			f = urllib.request.urlopen(request, data)
 			fr = f.read()
-		except URLError :
-			pass
-		return(fr)
+		except urllib.error.URLError :
+
+			print("Error")
+		else:
+			return(fr)
 	#https://maker.ifttt.com/trigger/{event}/with/key/iPUGsUMmzf9dS90kfOlajV45ZiaYPlDKV-bFvelUqh9
 	def presscamerabutton(self):
 		self.camerapage = CameraPage.CameraPage(self)
+		if self.camerapage.flag == 1:
+			self.filepath = 'user.png'
+			self.addpostpage = AddPostPage.AddPostPage(self)
+			try:
+				img =tk.PhotoImage(file = self.filepath)
+				# if im.shape[0]>300:
+				# 	image = cv2.resize(image, (600,300), interpolation = cv2.INTER_AREA)
+				# self.newlabel = tk.Canvas(self.addpostpage.filelabel,width = 1000,height = 1000,bg='red')
+				# self.newlabel.pack()
+			except (tk.TclError):
+				self.addpostpage.filelabel.configure(text = 'Please Upload a image png File.',fg = 'red')
+			else:
+				self.addpostpage.filelabel.configure(image = img)
+			self.mainloop()
+		else:
+			self.presshomebutton()
+
 	def sendemail(self,emailid, otp):
 	    # report = {}
 	    # report["value1"] = emailid
@@ -94,10 +112,30 @@ class Root(tk.Frame):
 
 	
 	def clickcancel(self):
+		self.abc = tk.Toplevel()
+		self.abc.geometry('+600+330')
+		l = tk.Label(self.abc,text = 'Do You Want to Close it?')
+		l.grid(row = 0,column= 2)
+		b1 = tk.Button(self.abc,text = 'Exit',command = self.exit)
+		b1.grid(row = 3,column= 3)
+		b2 = tk.Button(self.abc,text = 'Cancel',command = self.cancel)
+		b2.grid(row = 3,column= 1)
+		self.abc.title('Exit')
+	def exit(self):
+		self.abc.destroy()
 		self.master.destroy()
+	def cancel(self):
+		self.abc.destroy()
 
 	def clickEscape(self,event):
-		self.master.destroy()
+		self.abc = tk.Toplevel()
+		l = tk.Label(self.abc,text = 'Do You Want to Close it?')
+		l.pack()
+		b1 = tk.Button(self.abc,text = 'Exit',command = self.exit)
+		b1.grid(row = 0,column= 1)
+		b2 = tk.Button(self.abc,text = 'Cancel',command = self.cancel)
+		b2.grid(row = 0,column= 0)
+		
 
 	def _toggle_state(self,widget,state):
 		state = state if state in ('normal','disabled') else 'normal'
@@ -213,6 +251,7 @@ class Root(tk.Frame):
 				if flag == 0:
 					self.otp = self.generateOTP()
 					print(self.otp)
+					self.loginotp = Loginotp.Loginotp(self)
 					self.resp =  self.sendSMS('D/vVzW9HZmg-ShmTBFMcvXoHSSvRotC79CIw2QWK58', '+91%s'%(phnno),'Kilogram', 'Great Choice choosing Kilogram. In order to login into your account,your One Time Password is %s'%(str(self.otp)))
 					print(self.resp)
 					self.loginotp = Loginotp.Loginotp(self)
@@ -316,9 +355,10 @@ class Root(tk.Frame):
 				if flag == 0:
 					self.otp = self.generateOTP()
 					print(self.otp)
+					self.loginotp = Loginotp.Loginotp(self)
 					self.emailotp = self.sendemail(email,self.otp)
 					print(self.emailotp)
-					self.loginotp = Loginotp.Loginotp(self)
+					
 
 	def pressloginotp1(self):
 		fname = self.signuppage.firstnameentry.get()
@@ -401,6 +441,7 @@ class Root(tk.Frame):
 		self.mc.execute(sql,args)
 		friends = self.mc.fetchall()
 		friends = list(sum(friends, ()))
+		print(friends)
 
 		pids = []
 		for f in friends:
@@ -408,37 +449,44 @@ class Root(tk.Frame):
 			self.mc.execute(sql,f)
 			p = self.mc.fetchall()
 			p = list(sum(p, ()))
-			pids.append(p)
+			pids= pids+p
 
-		pids = sorted(pids,'reverse')
+		pids = sorted(pids,reverse=True)
 		print(pids)
 
-		uids = []
+		uuu = []
 		imm = []
+		cpp = []
 		for p in pids:
-			sql = 'SELECT uid from posts where pid = %s'
-			self.mc.execute(sql,p)
+			sql = 'SELECT username from user where uid =(SELECT uid from posts where pid = %s)'
+			self.mc.execute(sql%p)
 			g = self.mc.fetchall()
 			g = list(sum(g, ()))
-			uids.append(g)
+			uuu+=g
 
 			sql = 'SELECT imgs from posts where pid = %s'
 			self.mc.execute(sql,p)
 			im = self.mc.fetchall()
 			im = list(sum(im, ()))
-			imm.append(im)
+			imm+=im
 
-		abc = list(map(list,zip(uid,pid,imm)))
-		print(abc)
+			sql = 'SELECT caption from posts where pid = %s'
+			self.mc.execute(sql,p)
+			cp = self.mc.fetchall()
+			cp = list(sum(cp, ()))
+			cpp+=cp
 
-		self.index2 = 0
+		self.abc = list(map(list,zip(uuu,pids,imm,cpp)))
+		#print(abc)
 
-		if len(abc)>0:
+		self.index1 = 0
+
+		if len(self.abc)>0:
 			self.nextpost1()
 		else:
 			self._toggle_state(self.homepage.nextbutton,'disabled')
 			self._toggle_state(self.homepage.prevbutton,'disabled')
-			self.homepage.imagelabel.configure(text = 'No Images Try to follow few people.')
+			self.homepage.postlabel.configure(text = 'No Posts Try to follow few people.')
 
 	def nextbutton1(self):
 		self._toggle_state(self.homepage.prevbutton,'enabled')
@@ -447,38 +495,54 @@ class Root(tk.Frame):
 		
 
 	def prevbutton1(self):
-		self._toggle_state(self.myprofilepage.nextbutton,'enabled')
+		self._toggle_state(self.homepage.nextbutton,'enabled')
 		self.index1-=1
-		self.prevpost()
+		self.prevpost1()
 		
 
 	def nextpost1(self):
-		if(self.index1<=len(self.image)-1 and self.index1>=0):
-			image = io.imread(self.image[self.index1])
+		if(self.index1<=len(self.abc)-1 and self.index1>=0):
+			image = io.imread(self.abc[self.index1][2])
+			if image.shape[0]>300:
+				image = cv2.resize(image, (600,300), interpolation = cv2.INTER_AREA)
 			image = Image.fromarray(image)
 			image = ImageTk.PhotoImage(image)
-			self.myprofilepage.imagelabel.configure(image = image)
+			self.homepage.usernamelabel.configure(text = self.abc[self.index1][0])
+			self.homepage.captionlabel.configure(text = self.abc[self.index1][0])
+			self.homepage.captionmsg.configure(text = self.abc[self.index1][3])
+			self.homepage.postlabel.configure(image = image)
 			self.mainloop()
-		elif self.index<0:
-			self._toggle_state(self.myprofilepage.nextbutton,'disabled')
-			self.myprofilepage.imagelabel.configure(image = '',text = 'Press Next once more',fg = 'red')
+		elif self.index1<0:
+			self._toggle_state(self.homepage.nextbutton,'disabled')
+			self.homepage.postlabel.configure(image = '',text = 'Press Next once more',fg = 'red')
 		else:
-			self._toggle_state(self.myprofilepage.nextbutton,'disabled')
-			self.myprofilepage.imagelabel.configure(image = '',text = 'No More Images,Press Previous',fg = 'red')
+			self._toggle_state(self.homepage.nextbutton,'disabled')
+			self.homepage.usernamelabel.configure(text = "")
+			self.homepage.captionlabel.configure(text = "")
+			self.homepage.captionmsg.configure(text = "")
+			self.homepage.postlabel.configure(image = '',text = 'No More Images,Press Previous',fg = 'red')
 
 	def prevpost1(self):
-		if(self.index1>=0 and self.index1<=len(self.image)-1):
-			image = io.imread(self.image[self.index1])
+		if(self.index1>=0 and self.index1<=len(self.abc)-1):
+			image = io.imread(self.abc[self.index1][2])
+			if image.shape[0]>300:
+				image = cv2.resize(image, (600,300), interpolation = cv2.INTER_AREA)
 			image = Image.fromarray(image)
 			image = ImageTk.PhotoImage(image)
-			self.myprofilepage.imagelabel.configure(image = image)
+			self.homepage.usernamelabel.configure(text = self.abc[self.index1][0])
+			self.homepage.captionlabel.configure(text = self.abc[self.index1][0])
+			self.homepage.captionmsg.configure(text = self.abc[self.index1][3])
+			self.homepage.postlabel.configure(image = image)
 			self.mainloop()
-		elif self.index>len(self.image)-1:
-			self._toggle_state(self.myprofilepage.prevbutton,'disabled')
-			self.myprofilepage.imagelabel.configure(image = '',text = 'Press Previous once more',fg = 'red')
+		elif self.index1>len(self.abc)-1:
+			self._toggle_state(self.homepage.prevbutton,'disabled')
+			self.homepage.postlabel.configure(image = '',text = 'Press Previous once more',fg = 'red')
 		else:
-			self._toggle_state(self.myprofilepage.prevbutton,'disabled')
-			self.myprofilepage.imagelabel.configure(image = '',text = 'No More Images,Press Next',fg = 'red')
+			self._toggle_state(self.homepage.prevbutton,'disabled')
+			self.homepage.usernamelabel.configure(text = "")
+			self.homepage.captionlabel.configure(text = "")
+			self.homepage.captionmsg.configure(text = "")
+			self.homepage.postlabel.configure(image = '',text = 'No More Images,Press Next',fg = 'red')
 			
 
 
@@ -538,14 +602,19 @@ class Root(tk.Frame):
 		self.mc.execute(sql % self.fusername)
 		self.d = self.mc.fetchall()
 		self.d = list(sum(self.d, ()))
-		print(self.d[0])
-		print(self.uid)
-		if(self.d[0] == self.uid):
-			self._toggle_state(self.e,'disabled')
-			self.e.configure(text = "You cannot follow yourself ")
-		elif(self.d[0] in followers):
-			self._toggle_state(self.e,'disabled')
-			self.e.configure(text = "You already follow "+self.unames[0])
+		if(len(self.d) == 0):
+			self.e1 = tk.Button(self.searchpage.frame,font = helv36,text = "No Users Found",bg = "black",fg = "white",command = self.pressfollowbutton)
+			self.e1.place(relheight = 0.1,relwidth = 1,rely = 0.17)
+			# self.e1.configure(text = "No Users Found ")
+		else:
+			print(self.d[0])
+			print(self.uid)
+			if(self.d[0] == self.uid):
+				self._toggle_state(self.e,'disabled')
+				self.e.configure(text = "You cannot follow yourself ")
+			elif(self.d[0] in followers):
+				self._toggle_state(self.e,'disabled')
+				self.e.configure(text = "You already follow "+self.unames[0])
 
 
 		# self.unames = list(sum(self.unames, ()))
@@ -619,6 +688,8 @@ class Root(tk.Frame):
 		self.addpostpage = AddPostPage.AddPostPage(self)
 		try:
 			img =tk.PhotoImage(file = self.filepath)
+			# if im.shape[0]>300:
+			# 	image = cv2.resize(image, (600,300), interpolation = cv2.INTER_AREA)
 			# self.newlabel = tk.Canvas(self.addpostpage.filelabel,width = 1000,height = 1000,bg='red')
 			# self.newlabel.pack()
 		except (tk.TclError):
@@ -682,6 +753,8 @@ class Root(tk.Frame):
 	def nextpost(self):
 		if(self.index<=len(self.image)-1 and self.index>=0):
 			image = io.imread(self.image[self.index])
+			if image.shape[0]>300:
+				image = cv2.resize(image, (600,300), interpolation = cv2.INTER_AREA)
 			image = Image.fromarray(image)
 			image = ImageTk.PhotoImage(image)
 			self.myprofilepage.imagelabel.configure(image = image)
@@ -696,6 +769,8 @@ class Root(tk.Frame):
 	def prevpost(self):
 		if(self.index>=0 and self.index<=len(self.image)-1):
 			image = io.imread(self.image[self.index])
+			if image.shape[0]>300:
+				image = cv2.resize(image, (600,300), interpolation = cv2.INTER_AREA)
 			image = Image.fromarray(image)
 			image = ImageTk.PhotoImage(image)
 			self.myprofilepage.imagelabel.configure(image = image)
@@ -867,6 +942,19 @@ class Root(tk.Frame):
 
 	def presssearchbutton3(self):
 		# print("Hiis")
+		# self.fusername = self.dmpage.searchuser_entry.get()
+		# sql = 'SELECT username from user where username = "%s"'
+		# self.mc.execute(sql % self.fusername)
+		# self.unames = self.mc.fetchall()
+		# self.unames = list(sum(self.unames, ()))
+		# entry = {}
+		# j = 0.05
+		# for name in self.unames:
+		# 	self.e = tk.Button(self.dmpage.frame,text = name,bg = "black",fg = "white",command = self.pressmessagebutton1)
+		# 	self.e.place(relheight = 0.1,relwidth = 1,rely = j)
+		# 	entry[name] =self.e
+		# 	j += 0.12
+		##
 		self.fusername = self.dmpage.searchuser_entry.get()
 		sql = 'SELECT username from user where username = "%s"'
 		self.mc.execute(sql % self.fusername)
@@ -875,12 +963,37 @@ class Root(tk.Frame):
 		entry = {}
 		i = 0
 		j = 0.05
+		helv36 = tk.font.Font(family='Helvetica', size=30, weight='bold')
 		for name in self.unames:
-			self.e = tk.Button(self.dmpage.frame,text = self.unames[i],bg = "black",fg = "white",command = self.pressmessagebutton1)
+			self.e = tk.Button(self.dmpage.frame,font = helv36,text = "Message "+self.unames[i],bg = "black",fg = "white",command = self.pressmessagebutton1)
 			self.e.place(relheight = 0.1,relwidth = 1,rely = j)
 			entry[name] =self.e
 			j += 0.12
 			i += 1
+
+		# sql = 'SELECT fuid from friends where uid = (SELECT uid from user where username = "%s")'
+		# self.mc.execute(sql % self.username)
+		# followers = self.mc.fetchall()
+		# followers = list(sum(followers, ()))
+		# print(followers)
+		sql = 'SELECT uid from user where username = "%s"'
+		self.mc.execute(sql % self.fusername)
+		self.d = self.mc.fetchall()
+		self.d = list(sum(self.d, ()))
+		if(len(self.d) == 0):
+			self.e1 = tk.Button(self.dmpage.frame,font = helv36,text = "No Users Found",bg = "black",fg = "white")
+			self.e1.place(relheight = 0.1,relwidth = 1,rely = 0.05)
+			# self.e1.configure(text = "No Users Found ")
+		# else:
+		# 	print(self.d[0])
+		# 	print(self.uid)
+		# 	if(self.d[0] == self.uid):
+		# 		self._toggle_state(self.e,'disabled')
+		# 		self.e.configure(text = "You cannot follow yourself ")
+		# 	elif(self.d[0] in followers):
+		# 		self._toggle_state(self.e,'disabled')
+		# 		self.e.configure(text = "You already follow "+self.unames[0])
+
 
 	def presssendbutton(self):
 		self.msg = self.chat.message_entry.get()
@@ -941,24 +1054,24 @@ class Root(tk.Frame):
 			self.addcaptionpage.imagelabel.configure(image = img)
 			self.mainloop()
 
-	def presschangeprofilepicturebutton(self):
-		self.mc = self.connecttodatabase()
-		self.mc.execute('SELECT uid from profile')
+	# def presschangeprofilepicturebutton(self):
+	# 	self.mc = self.connecttodatabase()
+	# 	self.mc.execute('SELECT uid from profile')
 
-		uids = self.mc.fetchall()
-		uids=list(sum(uids, ()))
-		print(uids)
+	# 	uids = self.mc.fetchall()
+	# 	uids=list(sum(uids, ()))
+	# 	print(uids)
 
-		self.profilepath = ''
-		self.profilepath = filedialog.askopenfilename()
-		try:
-			img =tk.PhotoImage(file = self.profilepath)
-		except (tk.TclError):
-			self.myprofilepage.profilepic.configure(text = 'Please Upload a image png File.',fg = 'red')
-		else:
-			self.myprofilepage = MyProfilePage.MyProfilePage(self)
-			self.myprofilepage.profilepic.configure(image = img)
-			root.mainloop()
+	# 	self.profilepath = ''
+	# 	self.profilepath = filedialog.askopenfilename()
+	# 	try:
+	# 		img =tk.PhotoImage(file = self.profilepath)
+	# 	except (tk.TclError):
+	# 		self.myprofilepage.profilepic.configure(text = 'Please Upload a image png File.',fg = 'red')
+	# 	else:
+	# 		self.myprofilepage = MyProfilePage.MyProfilePage(self)
+	# 		self.myprofilepage.profilepic.configure(image = img)
+	# 		root.mainloop()
 
 
 
@@ -1033,46 +1146,94 @@ class Root(tk.Frame):
 		ffuid = self.mc.fetchall()
 		ffuid = list(sum(ffuid,()))
 
+		datauser = []
+		for f in ffuid:
+			sql = "SELECT username from user where uid = %s"
+			args = (f)
+			self.mc.execute(sql%args)
+			fffuid = self.mc.fetchall()
+			fffuid = list(sum(fffuid,()))
+			datauser+=fffuid
+
 		sql = "SELECT fid from friends where uid = %s"
 		args = (self.uid)
 		self.mc.execute(sql%args)
 		fid1 = self.mc.fetchall()
 		fid1 = list(sum(fid1,()))
 		
-		sql = "SELECT uid from friends where uid = %s"
+		sql = "SELECT fuid from friends where uid = %s"
 		args = (self.uid)
 		self.mc.execute(sql%args)
 		ffuid1 = self.mc.fetchall()
 		ffuid1 = list(sum(ffuid1,()))
+
+		datauser2 = []
+		for f in ffuid1:
+			sql = "SELECT username from user where uid = %s"
+			args = f
+			self.mc.execute(sql,args)
+			fffuid = self.mc.fetchall()
+			fffuid = list(sum(fffuid,()))
+			datauser2+=fffuid
 	
-		friends = list(map(list,zip(fid,ffuid)))
-		friends1 = list(map(list,zip(fid1,ffuid1)))
+		friends = list(map(list,zip(fid,ffuid,datauser)))
+		friends1 = list(map(list,zip(fid1,ffuid1,datauser2)))
+		print(friends)
 		print(friends1)
 
-		i = 0
-		w = len(friends1) - 1
+		
 		j = 0.05
 		for k in friends:
-			self.mc.execute("SELECT username from user where uid IN (SELECT uid from friends where fuid = %s)" %  self.uid)
-			friends_name = self.mc.fetchall()
-			friends_name = list(sum(friends_name,()))
-			print(friends_name)
-			label = tk.Label(self.notificationspage.following_frame,bg = "white", fg = "black",text = "%s started following you!" % friends_name[w])
+			label = tk.Label(self.notificationspage.following_frame,bg = "white", fg = "black",text = "%s started following you!" % k[2])
 			label.place(relwidth = 0.8,relheight = 0.05,relx = 0.1, rely = j)
-			i+=1
 			j+=0.05
 
-		z = 0
+	
 		for k in friends1:
-			self.mc.execute("SELECT username from user where uid IN (SELECT fuid from friends where uid = %s)" %  friends1[z][1])
-			friends_name = self.mc.fetchall()
-			friends_name = list(sum(friends_name,()))
-			print(friends_name)
-			label = tk.Label(self.notificationspage.followed_frame,bg = "white", fg = "black",text = "You started following %s!" % friends_name[w])
+			label = tk.Label(self.notificationspage.followed_frame,bg = "white", fg = "black",text = "You started following %s!" % k[2])
 			label.place(relwidth = 0.8,relheight = 0.05,relx = 0.1, rely = j)
-			i+=1
 			j+=0.05
 
+		sql = "SELECT mid from msgs where fuid = %s"
+		args = (self.uid)
+		self.mc.execute(sql%args)
+		fid = self.mc.fetchall()
+		fid = list(sum(fid,()))	
+		
+		sql = "SELECT uid from msgs where fuid = %s" #the uids from which i received the messages
+		args = (self.uid)
+		self.mc.execute(sql%args)
+		ffuid = self.mc.fetchall()
+		ffuid = list(sum(ffuid,()))
+
+		datauser = []
+		for f in ffuid:
+			sql = "SELECT username from user where uid = %s"
+			args = (f)
+			self.mc.execute(sql%args)
+			fffuid = self.mc.fetchall()
+			fffuid = list(sum(fffuid,()))
+			datauser+=fffuid
+
+		message = []
+		for f in ffuid:
+			sql = "SELECT msg from msgs where fuid = %s"
+			args = (self.uid)
+			self.mc.execute(sql%args)
+			messages = self.mc.fetchall()
+			messages = list(sum(messages,()))
+
+		friends = list(map(list,zip(fid,ffuid,datauser,messages)))
+		j = 0.05
+		friends = friends[-7:len(friends)]
+		for k in friends:
+			label = tk.Label(self.notificationspage.message_frame,bg = "white", fg = "black",text = "%s has sent you a message." % (k[2]))
+			label.place(relwidth = 0.8,relheight = 0.05,relx = 0.1, rely = j)
+			j+=0.05
+			
+			
+
+# disconnect krtoy me tula
 
 
 if __name__=='__main__':

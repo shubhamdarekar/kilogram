@@ -21,6 +21,6 @@ class EditProfile(tk.Frame):
 		changepassword_button = tk.Button(self.maineditprofile_frame,bg = "black",fg = "white",text = "Change Password",font = ('bold',20),command = master.presschangepasswordbutton)
 		changepassword_button.place(relheight = 0.1,relwidth = 0.8,relx = 0.1,rely = 0.40)
 
-		changeprofilepicture_button = tk.Button(self.maineditprofile_frame,bg = "black",fg = "white",text = "Change Profile Picture",font = ('bold',20),command = master.presschangeprofilepicturebutton)
-		changeprofilepicture_button.place(relheight = 0.1,relwidth = 0.8,relx = 0.1,rely = 0.55)
+		# changeprofilepicture_button = tk.Button(self.maineditprofile_frame,bg = "black",fg = "white",text = "Change Profile Picture",font = ('bold',20),command = master.presschangeprofilepicturebutton)
+		# changeprofilepicture_button.place(relheight = 0.1,relwidth = 0.8,relx = 0.1,rely = 0.55)
 

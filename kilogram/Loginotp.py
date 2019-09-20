@@ -6,7 +6,7 @@ class Loginotp(tk.Frame):
 		mainlogin_frame=tk.Frame(master.canvas,bg='white')
 		mainlogin_frame.place(relheight=1, relwidth = 1)
 
-		login_frame = tk.Frame(mainlogin_frame,bg="#ebedd7",relief='sunken')
+		login_frame = tk.Frame(mainlogin_frame,bg="white",relief='sunken')
 		login_frame.place(height = 450,width = 756,relx = 0.15,rely = 0.1)
 
 		kilogramlabel=tk.Label(login_frame,text='Kilogram',font=35)
@@ -37,7 +37,7 @@ class Loginotp(tk.Frame):
 		otplogin_button = tk.Button(login_frame,text = 'Login',default = 'active',command = master.pressloginotp1)
 		otplogin_button.place(relx = 0.4, rely = 0.7)
 
-		signuppage_frame = tk.Frame(master.canvas, bg = '#ebedd7',relief='sunken')
+		signuppage_frame = tk.Frame(master.canvas, bg = 'white',relief='sunken')
 		signuppage_frame.place(height=70,width=756, relx = 0.15, rely =0.8 )
 
 		signup_label= tk.Label(signuppage_frame,text='New To kilogram? ')

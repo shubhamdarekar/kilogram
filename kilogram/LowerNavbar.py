@@ -12,6 +12,7 @@ class Lowernavbar:
 
 		screen1 = tk.Frame(master.canvas,bg="white")
 		screen1.place(relheight = 1,relwidth = 1)
+
 		
 		uppernavbarframe = tk.Frame(screen1,bg = "black")
 		uppernavbarframe.place(relheight = 0.075,relwidth = 1)
@@ -27,6 +28,7 @@ class Lowernavbar:
 
 		self.midframe = tk.Frame(master.canvas,bg = 'white')
 		self.midframe.place(rely = 0.075 ,relheight = 0.875,relwidth=1)
+
 
 		lowernavbarframe = tk.Frame(screen1,bg = "black")
 		lowernavbarframe.place(relheight = 0.05,relwidth = 1,rely = 0.95)

@@ -8,11 +8,11 @@ class MyProfilePage(tk.Frame):
 		# myprofilelabel=tk.Label(mainprofileframe, text="My Profile", bg='pink', font=('bold'))
 		# myprofilelabel.place(relx=0.44,rely=0.03, relwidth=0.3, relheight=0.045)
 
-		self.profilepic=tk.Label(mainprofileframe,text = 'Go to edit Profile\n to Change Profile Pic')
-		self.profilepic.place(relx=0.22,rely=0.05,relwidth=0.15, relheight=0.18)
+		# self.profilepic=tk.Label(mainprofileframe,text = 'Go to edit Profile\n to Change Profile Pic')
+		# self.profilepic.place(relx=0.22,rely=0.05,relwidth=0.15, relheight=0.18)
 
-		self.username1label=tk.Label(mainprofileframe,bg = 'white',font = ('Ariel',25))
-		self.username1label.place(relx=0.22,rely=0.23,relwidth=0.15, relheight=0.055)
+		self.username1label=tk.Label(mainprofileframe,bg = 'white',font = ('Times',25,'bold'))
+		self.username1label.place(relx=0.18,rely=0.14,relwidth=0.2, relheight=0.055)
 
 		self.postnumber = tk.Label(mainprofileframe,text = '0',bg = 'white',font = ('Ariel',30) )
 		self.postnumber.place(relx = 0.44,rely = 0.09)
@@ -51,10 +51,10 @@ class MyProfilePage(tk.Frame):
 		self.imagelabel.place(relheight = 0.8,relwidth=1)
 
 		self.nextbutton = tk.Button(imagepost_frame,bg = 'black',command =master.nextbutton,text = 'Next' ,fg = 'White')
-		self.nextbutton.place(relx = 0.7,rely = 0.84)
+		self.nextbutton.place(relx = 0.7,rely = 0.84,relwidth = 0.2)
 
 		self.prevbutton = tk.Button(imagepost_frame,bg = 'black',command =master.prevbutton,text = 'Previous' ,fg = 'White')
-		self.prevbutton.place(relx = 0.4,rely = 0.84)
+		self.prevbutton.place(relx = 0.2,rely = 0.84,relwidth = 0.2)
 
 		self.mc = master.connecttodatabase()
 		self.mc.execute('SELECT uid from profile')
