@@ -252,7 +252,7 @@ class Root(tk.Frame):
 					self.otp = self.generateOTP()
 					print(self.otp)
 					self.loginotp = Loginotp.Loginotp(self)
-					self.resp =  self.sendSMS('D/vVzW9HZmg-ShmTBFMcvXoHSSvRotC79CIw2QWK58', '+91%s'%(phnno),'Kilogram', 'Great Choice choosing Kilogram. In order to login into your account,your One Time Password is %s'%(str(self.otp)))
+					self.resp =  self.sendSMS('/apikey/', '+91%s'%(phnno),'Kilogram', 'Great Choice choosing Kilogram. In order to login into your account,your One Time Password is %s'%(str(self.otp)))
 					print(self.resp)
 					self.loginotp = Loginotp.Loginotp(self)
 					
